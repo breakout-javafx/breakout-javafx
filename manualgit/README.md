@@ -152,23 +152,25 @@ git remote -v    # Verifica los remotos existentes
    git clone https://github.com/usuario/repositorio.git
    ```
 
-2. Crea una rama:
+2. Crea una rama (y moverte a esa rama):
    ```
    git checkout -b nombre-rama
    ```
-
-3. Haz cambios, agrégalos y haz commit:
+3. Moverte a una rama ya existente:
+   ```
+   git checkout nombre-rama
+   ```
+4. Haz cambios, agrégalos (manualmente o con . para seleccionar todos los archivos) y haz commit:
    ```
    git add .
    git commit -m "Descripción clara del cambio"
    ```
 
-4. Sube la rama:
+5. Sube la rama:
    ```
    git push origin nombre-rama
    ```
-
-5. Abre un Pull Request en GitHub.
+6. Abre un Pull Request en GitHub.
 
 ---
 
