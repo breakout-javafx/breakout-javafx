@@ -1,1 +1,5 @@
+com/breakout/core/GameApp.class
+com/breakout/core/GameLoop.class
 com/breakout/Main.class
+com/breakout/entites/Ball.class
+com/breakout/entites/Paddle.class
