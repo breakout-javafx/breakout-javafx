@@ -11,8 +11,27 @@
 .settings/
 
 # Maven
-target/
+/target/
+
 # Otros comunes
 .DS_Store
 *.log
 *.tmp
+
+# Compiled class files
+*.class
+
+# Windows thumbnails
+Thumbs.db
+
+# Java specific
+*.jar
+*.war
+*.ear
+
+# Maven wrapper (if used)
+.mvn/
+
+# User-specific files
+*.user
+*.swp
