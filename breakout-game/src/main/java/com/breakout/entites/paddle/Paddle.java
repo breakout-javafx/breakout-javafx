@@ -1,4 +1,4 @@
-package com.breakout.entites;
+package com.breakout.entites.paddle;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;

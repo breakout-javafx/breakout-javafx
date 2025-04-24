@@ -1,4 +1,4 @@
-package com.breakout.entites;
+package com.breakout.entites.ball;
 
 import com.breakout.core.GameApp;
 import javafx.scene.canvas.GraphicsContext;

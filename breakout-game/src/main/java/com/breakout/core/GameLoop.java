@@ -1,7 +1,7 @@
 package com.breakout.core;
 
-import com.breakout.entites.Ball;
-import com.breakout.entites.Paddle;
+import com.breakout.entites.ball.Ball;
+import com.breakout.entites.paddle.Paddle;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -27,6 +27,7 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void update() {
+
         ball.update();
 
         if (leftPressed) paddle.moveLeft();
