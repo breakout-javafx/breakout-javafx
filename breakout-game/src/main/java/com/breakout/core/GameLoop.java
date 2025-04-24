@@ -16,7 +16,7 @@ public class GameLoop extends AnimationTimer {
 
     public GameLoop(GraphicsContext gc) {
         this.gc = gc;
-        this.ball = new Ball(400, 300);
+        this.ball = new Ball(GameApp.WIDTH / 2.0, GameApp.HEIGHT / 2.0); // Centrada
         this.paddle = new Paddle();
     }
 
@@ -30,32 +30,26 @@ public class GameLoop extends AnimationTimer {
 
         ball.update();
 
+        // Movimiento del paddle
         if (leftPressed) paddle.moveLeft();
         if (rightPressed) paddle.moveRight();
 
-        // rebote básico contra la paleta
+        // Rebote con el paddle
         if (ball.getY() + ball.getRadius() >= paddle.getY() &&
-                ball.getX() >= paddle.getX() &&
-                ball.getX() <= paddle.getX() + paddle.getWidth()) {
+                ball.getX() + ball.getRadius() >= paddle.getX() &&  // Asegurar que la pelota no se pase por el borde
+                ball.getX() - ball.getRadius() <= paddle.getX() + paddle.getWidth()) {
             ball.invertY();
         }
     }
 
+
     private void render() {
-        gc.clearRect(0, 0, 800, 600);
+        gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
         ball.render(gc);
         paddle.render(gc);
     }
 
-    public void setLeftPressed(boolean b) {
-        leftPressed = b;
-    }
-
-    public void setRightPressed(boolean b) {
-        rightPressed = b;
-    }
-
-    public Paddle getPaddle() {
-        return paddle;
-    }
+    public void setLeftPressed(boolean b) { leftPressed = b; }
+    public void setRightPressed(boolean b) { rightPressed = b; }
+    public Paddle getPaddle() { return paddle; }
 }
