@@ -4,9 +4,7 @@
 
 Este proyecto implementa una versión moderna del clásico juego **Breakout**, desarrollado en **Java con JavaFX** como motor gráfico, y estructurado completamente mediante **patrones de diseño orientados a objetos**.
 Expandir
-message.txt
-7 KB
-﻿
+
 # 🎮 Proyecto: Breakout con Patrones de Diseño en Java
 
 ## 📌 Descripción General
