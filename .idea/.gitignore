@@ -12,7 +12,6 @@
 
 # Maven
 target/
-
 # Otros comunes
 .DS_Store
 *.log
