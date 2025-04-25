@@ -47,6 +47,7 @@ public class BrickSpawner {
             boolean positionFound = false;
             int retryCount = 0;
 
+            // Intentar encontrar una posición disponible para el bloque, ampliando el área de búsqueda
             while (!positionFound && retryCount < maxRetries) {
                 double offsetX = random.nextDouble() * offsetXMax - (offsetXMax / 2);  // Variación en X dentro del cluster
                 double offsetY = random.nextDouble() * offsetYMax - (offsetYMax / 2);  // Variación en Y dentro del cluster
@@ -83,6 +84,7 @@ public class BrickSpawner {
         // Recursivamente generar el siguiente cluster
         generateClusterRecursive(bricks, currentCluster + 1, maxClusters);
     }
+
 
 
     private AbstractBrick applyRandomDecorator(AbstractBrick brick) {
