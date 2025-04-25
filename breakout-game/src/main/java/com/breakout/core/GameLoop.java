@@ -2,9 +2,14 @@ package com.breakout.core;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.entites.ball.Ball;
+import com.breakout.entites.brick.AbstractBrick;
+import com.breakout.entites.brick.BrickSpawner;
 import com.breakout.entites.paddle.Paddle;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class GameLoop extends AnimationTimer {
 
@@ -15,6 +20,7 @@ public class GameLoop extends AnimationTimer {
     private final GraphicsContext gc;
     private final Ball ball;
     private final Paddle paddle;
+    private List<AbstractBrick> bricks;
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -31,6 +37,10 @@ public class GameLoop extends AnimationTimer {
         // Crear el paddle primero
         this.paddle = new Paddle(GameApp.WIDTH / 2.0 - (ConfigLoader.getInstance().getInt("paddle.width") / 2.0),
                 GameApp.HEIGHT - ConfigLoader.getInstance().getInt("paddle.height"));
+
+        // Generar los bricks utilizando el BrickSpawner
+        BrickSpawner brickSpawner = new BrickSpawner();
+        this.bricks = brickSpawner.generateBricks();
     }
 
     @Override
@@ -67,6 +77,17 @@ public class GameLoop extends AnimationTimer {
                 ball.getX() - ball.getRadius() <= paddle.getX() + paddle.getWidth()) {
             ball.invertY();
         }
+
+        // Colisión con los bricks usando un Iterator para evitar ConcurrentModificationException
+        Iterator<AbstractBrick> iterator = bricks.iterator();
+        while (iterator.hasNext()) {
+            AbstractBrick brick = iterator.next();
+            if (ball.getBounds().intersects(brick.getBounds())) {
+                // Acción de colisión con el brick
+                ball.invertY();  // Por ejemplo, invertir la dirección de la pelota
+                iterator.remove();  // Eliminar el brick de forma segura
+            }
+        }
     }
 
     private void render() {
@@ -75,6 +96,11 @@ public class GameLoop extends AnimationTimer {
 
         // Dibujar el borde alrededor del área de juego
         gc.strokeRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT); // Borde alrededor del canvas
+
+        // Dibujar los bricks
+        for (AbstractBrick brick : bricks) {
+            brick.render(gc);
+        }
 
         // Dibujar el balón y el paddle
         ball.render(gc);

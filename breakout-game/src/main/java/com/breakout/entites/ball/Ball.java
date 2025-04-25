@@ -2,6 +2,7 @@ package com.breakout.entites.ball;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.core.GameApp;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -37,5 +38,10 @@ public class Ball {
 
     public void invertY() {
         dy *= -1;
+    }
+
+    // Método para obtener los límites de la pelota, útil para la detección de colisiones
+    public Rectangle2D getBounds() {
+        return new Rectangle2D(x - radius, y - radius, 2 * radius, 2 * radius);
     }
 }

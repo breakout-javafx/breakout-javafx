@@ -1,5 +1,6 @@
 package com.breakout.entites.brick;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 
 /*
@@ -48,5 +49,8 @@ public abstract class AbstractBrick {
     public double getWidth() { return width; }
     public double getHeight() { return height; }
 
-
+    // Agregado: Método getBounds() para obtener el área del ladrillo
+    public Rectangle2D getBounds() {
+        return new Rectangle2D(x, y, width, height);
+    }
 }
