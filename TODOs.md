@@ -3,7 +3,6 @@
 - **URG (Urgente)**: Tareas críticas que deben ser resueltas lo más rápido posible.
 - **MED (Media)**: Tareas importantes, pero no tan urgentes.
 - **LOW (Baja)**: Tareas que no afectan significativamente el funcionamiento y pueden esperar.
-- **FUT (Futura)**: Tareas para planificar en el futuro, no son prioritarias aún.
 
 ## 🛑 Tareas urgentes (URG)
 
@@ -45,12 +44,9 @@
   *Añadir un menu de juego al presionar esc. Opciones: [Continuar, Reiniciar, Ajustes, Salir].*  
   **Done by:** _[Nombre del responsable]_
 
-## 📅 Tareas futuras (para planificación)
-- [ ] **Ejemplo de tarea futura**  
-  *Descripción de la tarea futura, por ejemplo, "Implementar una nueva característica Z para la versión 2.0".*  
-  **Done by:** _[Nombre del responsable]_
 
----
+
+## Resumen patrones implementados
 
 | **Patrón**    | **Uso**                             |
 |---------------|-------------------------------------|

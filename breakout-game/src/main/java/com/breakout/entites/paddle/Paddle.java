@@ -12,18 +12,14 @@ public class Paddle {
     private final double height;
     private final double speed;
 
-    public Paddle() {
+    public Paddle(double initialX, double initialY) {
         // Leer las configuraciones desde el archivo .properties
         this.width = ConfigLoader.getInstance().getInt("paddle.width");
         this.height = ConfigLoader.getInstance().getInt("paddle.height");
         this.speed = ConfigLoader.getInstance().getInt("paddle.speed");
 
-        // Configuración de posición Y desde el archivo .properties
-        // Si no existe, calculamos la posición Y de acuerdo con la altura de la pantalla
-        this.y = ConfigLoader.getInstance().getInt("paddle.positionY");
-
-        // Calcular posición X para centrar el paddle
-        this.x = (GameApp.WIDTH - width) / 2.0;
+        this.x = initialX;
+        this.y = initialY;
     }
 
     public void moveLeft() {

@@ -1,5 +1,6 @@
 package com.breakout.core;
 
+import com.breakout.config.ConfigLoader;
 import com.breakout.entites.ball.Ball;
 import com.breakout.entites.paddle.Paddle;
 import javafx.animation.AnimationTimer;
@@ -7,7 +8,8 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class GameLoop extends AnimationTimer {
 
-    private static final double TARGET_FPS = 60.0; // FPS deseados
+    // FPS deseados, ahora desde el archivo de configuración
+    private static final double TARGET_FPS = Math.max(ConfigLoader.getInstance().getInt("game.fps"), 30); // Asegura que el FPS no sea menor a 30
     private static final double NANOS_PER_UPDATE = 1_000_000_000.0 / TARGET_FPS;
 
     private final GraphicsContext gc;
@@ -22,8 +24,13 @@ public class GameLoop extends AnimationTimer {
 
     public GameLoop(GraphicsContext gc) {
         this.gc = gc;
-        this.ball = new Ball(GameApp.WIDTH / 2.0, GameApp.HEIGHT / 2.0); // Centrada
-        this.paddle = new Paddle();
+
+        // Crear la pelota y colocarla en el centro de la pantalla
+        this.ball = new Ball(GameApp.WIDTH / 2.0, GameApp.HEIGHT / 2.0);
+
+        // Crear el paddle primero
+        this.paddle = new Paddle(GameApp.WIDTH / 2.0 - (ConfigLoader.getInstance().getInt("paddle.width") / 2.0),
+                GameApp.HEIGHT - ConfigLoader.getInstance().getInt("paddle.height"));
     }
 
     @Override
@@ -33,17 +40,27 @@ public class GameLoop extends AnimationTimer {
             update();
             lastUpdateTime = now;
         }
-        render();  // El renderizado sigue ocurriendo a cada fotograma
+        render();
     }
 
     private void update() {
         // Actualiza la lógica del juego (movimiento, colisiones, etc.)
-        ball.update();
+        updateBall();
+        updatePaddle();
+        handleCollisions();
+    }
 
+    private void updateBall() {
+        ball.update();
+    }
+
+    private void updatePaddle() {
         // Movimiento del paddle
         if (leftPressed) paddle.moveLeft();
         if (rightPressed) paddle.moveRight();
+    }
 
+    private void handleCollisions() {
         // Rebote con el paddle
         if (ball.getY() + ball.getRadius() >= paddle.getY() &&
                 ball.getX() + ball.getRadius() >= paddle.getX() &&  // Asegurar que la pelota no se pase por el borde
@@ -53,12 +70,20 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void render() {
+        // Limpiar el canvas
         gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
+
+        // Dibujar el borde alrededor del área de juego
+        gc.strokeRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT); // Borde alrededor del canvas
+
+        // Dibujar el balón y el paddle
         ball.render(gc);
         paddle.render(gc);
     }
 
+    // Métodos para manejar las teclas presionadas
     public void setLeftPressed(boolean b) { leftPressed = b; }
     public void setRightPressed(boolean b) { rightPressed = b; }
+
     public Paddle getPaddle() { return paddle; }
 }
