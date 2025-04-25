@@ -31,10 +31,13 @@
   **Done by:** _[Nombre del responsable]_
 
 
-- [ ] **Algoritmo spawn brick**
+- [x] **Algoritmo spawn brick**
   *Diseñar el algoritmo de spawn de los mismos*  
-  **Done by:** _[Nombre del responsable]_
+  **Done by:** _[javi]_
 
+- [ ] **Ajuste tamaño ventan juego**
+  *Implementar el ajuste del tamaño de la ventana de juego (no ventana total) desde el .properties.*  
+  **Done by:** _[]_
 
 - [ ] **Score tracker**
   *Investigar, crear e implentar la tabla de puntuación y su lógica*  

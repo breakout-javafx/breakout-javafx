@@ -21,6 +21,8 @@ public class BrickSpawner {
     private static final double brickWidth = ConfigLoader.getInstance().getInt("brick.width");
     private static final double brickHeight = ConfigLoader.getInstance().getInt("brick.height");
 
+    private static final int maxRetries = ConfigLoader.getInstance().getInt("brick.generation.maxretries");
+
     private Random random = new Random();
 
     public List<AbstractBrick> generateBricks() {
@@ -40,7 +42,6 @@ public class BrickSpawner {
         // Contadores
         int blocksGenerated = 0;
         int blocksFailed = 0;
-        int maxRetries = 100;  // Limitar el número de intentos antes de abandonar la creación de bloques
 
         // Generar los bricks dentro del cluster
         for (int i = 0; i < clusterSize; i++) {
