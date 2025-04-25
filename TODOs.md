@@ -28,12 +28,12 @@
 
 - [x] **Añadir delimitadores del panel de juego (bordes)**  
   *Dibujar los bordel del panel de juego para que se vean de forma clara los límites*  
-  **Done by:** _[Nombre del responsable]_
+  **Done by:** _[Javi]_
 
 
 - [x] **Cambiar pos inical de paddle**  
   *Hacer que el paddle aparezca y se mantenta en la parte inferiror del cuadro de juego*  
-  **Done by:** _[Nombre del responsable]_
+  **Done by:** _[Javi]_
 
 
 - [x] **Creación de bricks**  
@@ -48,7 +48,7 @@
 
 - [ ] **Ajuste tamaño ventan juego**
   *Implementar el ajuste del tamaño de la ventana de juego (no ventana total) desde el .properties.*  
-  **Done by:** _[]_
+  **Done by:** _[Nombre del responsable]_
 
 
 - [ ] **Score tracker**  
