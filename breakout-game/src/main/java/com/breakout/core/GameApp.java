@@ -18,11 +18,38 @@ public class GameApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // 1. Config base
+        // Configuración base
+        initializeWindow(primaryStage);
+
+        // Crear y mostrar el canvas y escena
+        Canvas canvas = createCanvas(primaryStage);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Crear el GameLoop
+        GameLoop loop = new GameLoop(gc);
+        loop.start();
+
+        // Configurar los eventos de entrada
+        configureInput(primaryStage.getScene(), loop);
+    }
+
+    private void initializeWindow(Stage primaryStage) {
+        // Obtener las dimensiones de la pantalla
         int baseWidth = ConfigLoader.getInstance().getInt("window.width");
         int baseHeight = ConfigLoader.getInstance().getInt("window.height");
 
-        // 2. Escalado
+        // Escalar la ventana
+        scaleWindow(baseWidth, baseHeight);
+
+        // Configuración de la ventana
+        primaryStage.setTitle(TITLE);
+        primaryStage.setFullScreen(true);  // Pantalla completa
+        primaryStage.setFullScreenExitHint(""); // Opcional
+        primaryStage.centerOnScreen(); // Centra automáticamente
+
+    }
+
+    private void scaleWindow(int baseWidth, int baseHeight) {
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         double scaleX = screenBounds.getWidth() / 1920.0;
         double scaleY = screenBounds.getHeight() / 1080.0;
@@ -30,24 +57,24 @@ public class GameApp extends Application {
 
         WIDTH = (int) (baseWidth * scale);
         HEIGHT = (int) (baseHeight * scale);
+    }
 
-        // 3. Canvas y escena
+    private Canvas createCanvas(Stage primaryStage) {
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        GameLoop loop = new GameLoop(gc);
-        loop.start();
 
         StackPane root = new StackPane(canvas);
-        root.setPrefSize(WIDTH, HEIGHT); // 🔧 Esto asegura que el pane no crezca
+        root.setPrefSize(WIDTH, HEIGHT);
         Scene scene = new Scene(root);
 
-        // 4. Ventana
-        primaryStage.setTitle(TITLE);
+        // Mostrar la ventana
         primaryStage.setScene(scene);
-        primaryStage.centerOnScreen(); // Centra automáticamente
         primaryStage.show();
 
-        // 5. Input
+        return canvas;
+    }
+
+    private void configureInput(Scene scene, GameLoop loop) {
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.LEFT) loop.setLeftPressed(true);
             if (e.getCode() == KeyCode.RIGHT) loop.setRightPressed(true);

@@ -12,6 +12,7 @@
 
 # Maven
 /target/
+**/target/
 
 # Otros comunes
 .DS_Store
