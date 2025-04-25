@@ -62,6 +62,14 @@
   *Una vez implementados los bricks diseñar las texturas y colores de los mismos.*  
   **Done by:** _[Nombre del responsable]_
 
+- [ ] **Añadir un numero de vidas al brick**  
+  *Implementar núermo de vidas por brick y cambiar aspecto en función de las vidas. Implementar junto a tarea ""Añadir decoratos Brick"*  
+  **Done by:** _[Nombre del responsable]_
+
+- [ ] **Añadir decoratos Brick**  
+  *UDiseñar e implementar mas decoradores para brick. Añadirlos al algoritmo de generación. SI hay duda hablar ocn Javi.*  
+  **Done by:** _[Nombre del responsable]_
+
 ---
 
 ## 🟢 Tareas de baja prioridad (LOW)
