@@ -22,7 +22,7 @@ public class GameApp extends Application {
         int baseWidth = ConfigLoader.getInstance().getInt("window.width");
         int baseHeight = ConfigLoader.getInstance().getInt("window.height");
 
-        // 2. Escalado
+        // 2. Escalado (mantener las proporciones)
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         double scaleX = screenBounds.getWidth() / 1920.0;
         double scaleY = screenBounds.getHeight() / 1080.0;
@@ -38,12 +38,14 @@ public class GameApp extends Application {
         loop.start();
 
         StackPane root = new StackPane(canvas);
-        root.setPrefSize(WIDTH, HEIGHT); // 🔧 Esto asegura que el pane no crezca
+        root.setPrefSize(WIDTH, HEIGHT); // Asegura que el pane no crezca
         Scene scene = new Scene(root);
 
         // 4. Ventana
         primaryStage.setTitle(TITLE);
         primaryStage.setScene(scene);
+        primaryStage.setFullScreen(true);  // Pone la ventana en modo pantalla completa
+        primaryStage.setFullScreenExitHint("Salir");  // Opcional: No mostrar el hint de salida
         primaryStage.centerOnScreen(); // Centra automáticamente
         primaryStage.show();
 

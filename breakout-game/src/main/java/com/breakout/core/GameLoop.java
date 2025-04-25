@@ -7,12 +7,18 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class GameLoop extends AnimationTimer {
 
+    private static final double TARGET_FPS = 60.0; // FPS deseados
+    private static final double NANOS_PER_UPDATE = 1_000_000_000.0 / TARGET_FPS;
+
     private final GraphicsContext gc;
     private final Ball ball;
     private final Paddle paddle;
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
+
+    // Control del tiempo
+    private long lastUpdateTime = 0;
 
     public GameLoop(GraphicsContext gc) {
         this.gc = gc;
@@ -22,12 +28,16 @@ public class GameLoop extends AnimationTimer {
 
     @Override
     public void handle(long now) {
-        update();
-        render();
+        // Control del tiempo de actualización para mantener la tasa de FPS
+        if (now - lastUpdateTime >= NANOS_PER_UPDATE) {
+            update();
+            lastUpdateTime = now;
+        }
+        render();  // El renderizado sigue ocurriendo a cada fotograma
     }
 
     private void update() {
-
+        // Actualiza la lógica del juego (movimiento, colisiones, etc.)
         ball.update();
 
         // Movimiento del paddle
@@ -41,7 +51,6 @@ public class GameLoop extends AnimationTimer {
             ball.invertY();
         }
     }
-
 
     private void render() {
         gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
