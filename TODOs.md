@@ -18,11 +18,11 @@
   *La ventana se inicializa en pantalla completa. El panel de juego es más pequeño que la pantalla.*  
   **Done by:** _[javi]_
 
-- [ ] **Añadir delimitadores del panel de juego (bordes)**
+- [x] **Añadir delimitadores del panel de juego (bordes)**
   *Dibujar los bordel del panel de juego para que se vean de forma clara los límites*  
   **Done by:** _[Nombre del responsable]_
 
-- [ ] **Cambiar pos inical de paddle**
+- [x] **Cambiar pos inical de paddle**
   *Hacer que el paddle aparezca y se mantenta en la parte inferiror del cuadro de juego*  
   **Done by:** _[Nombre del responsable]_
 
