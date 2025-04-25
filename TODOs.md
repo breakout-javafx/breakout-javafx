@@ -26,9 +26,15 @@
   *Hacer que el paddle aparezca y se mantenta en la parte inferiror del cuadro de juego*  
   **Done by:** _[Nombre del responsable]_
 
-- [ ] **Creación de bricks**
-  *Crear el objeto brick y diseñar el algoritmo de spawn de los mismos*  
+- [x] **Creación de bricks**
+  *Crear el objeto brick implementado patrones de uso*  
   **Done by:** _[Nombre del responsable]_
+
+
+- [ ] **Algoritmo spawn brick**
+  *Diseñar el algoritmo de spawn de los mismos*  
+  **Done by:** _[Nombre del responsable]_
+
 
 - [ ] **Score tracker**
   *Investigar, crear e implentar la tabla de puntuación y su lógica*  
@@ -48,11 +54,11 @@
 
 ## Resumen patrones implementados
 
-| **Patrón**    | **Uso**                             |
-|---------------|-------------------------------------|
-| **Singleton** | ConfigLoader    |
-| **Patrón 2**  | Descripción de dónde se ha usado    |
-| **Patrón 3**  | Descripción de dónde se ha usado    |
-| **Patrón 4**  | Descripción de dónde se ha usado    |
-| **Patrón 5**  | Descripción de dónde se ha usado    |
-| **Patrón 6**  | Descripción de dónde se ha usado    |
+| **Patrón**    | **Uso (Clase)**                  |
+|---------------|----------------------------------|
+| **Singleton** | ConfigLoader                     |
+| **Decorator** | AbstractBrick                    |
+| **Template**  | AbstractBrick                    |
+| **Patrón 4**  | Descripción de dónde se ha usado |
+| **Patrón 5**  | Descripción de dónde se ha usado |
+| **Patrón 6**  | Descripción de dónde se ha usado |
