@@ -79,6 +79,7 @@ public class GameApp extends Application {
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.LEFT) loop.setLeftPressed(true);
             if (e.getCode() == KeyCode.RIGHT) loop.setRightPressed(true);
+            if (e.getCode() == KeyCode.SPACE) loop.startGame(); // Inicia la partida
         });
 
         scene.setOnKeyReleased(e -> {

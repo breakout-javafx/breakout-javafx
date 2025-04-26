@@ -38,7 +38,7 @@
 
 - [x] **Creación de bricks**  
   *Crear el objeto brick implementado patrones de uso*  
-  **Done by:** _[Nombre del responsable]_
+  **Done by:** _[javi]_
 
 
 - [x] **Algoritmo spawn brick**  
@@ -49,10 +49,14 @@
   *Implementación patrón strategy a Ball*  
   **Done by:** _[javi]_
 
+- [x] **Posición Ball al empezar**  
+  *La pelota se mueve a donde este el Paddel. Solo al pulsar espacio la partida comienza*  
+  **Done by:** _[javi]_
 
 - [ ] **Ajuste tamaño ventan juego**  
   *Implementar el ajuste del tamaño de la ventana de juego (no ventana total) desde el .properties.*  
   **Done by:** _[Nombre del responsable]_
+- 
 
 
 - [ ] **Score tracker**  
