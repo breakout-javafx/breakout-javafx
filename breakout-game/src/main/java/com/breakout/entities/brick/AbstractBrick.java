@@ -21,19 +21,21 @@ glowingBrick.render(graphicsContext);
 */
 
 
+
 public abstract class AbstractBrick {
     protected double x, y;
     protected double width, height;
+    protected int score;   // Solo definición, no sumamos aquí
+    protected int health = 1;
 
     public AbstractBrick(double x, double y, double width, double height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        createBrick(); // Método template
+        createBrick();
     }
 
-    // Template method
     protected final void createBrick() {
         initializeShape();
         initializeColor();
@@ -49,8 +51,14 @@ public abstract class AbstractBrick {
     public double getWidth() { return width; }
     public double getHeight() { return height; }
 
-    // Agregado: Método getBounds() para obtener el área del ladrillo
     public Rectangle2D getBounds() {
         return new Rectangle2D(x, y, width, height);
     }
+
+    // Score y vida
+    public int getScore() { return score; }
+    public void setScore(int score) { this.score = score; }
+
+    public void hit() { health--; }
+    public boolean isDestroyed() { return health <= 0; }
 }

@@ -8,6 +8,7 @@ public class GlowingBrickDecorator extends BrickDecorator {
 
     public GlowingBrickDecorator(AbstractBrick decoratedBrick) {
         super(decoratedBrick);
+        this.score = decoratedBrick.getScore() + 20; // GlowingBrick suma +20 puntos
     }
 
     @Override
@@ -20,14 +21,7 @@ public class GlowingBrickDecorator extends BrickDecorator {
     }
 
     @Override
-    protected void initializeShape() {
-        // Nada: ya lo hace el ladrillo decorado
-    }
-
+    protected void initializeShape() {}
     @Override
-    protected void initializeColor() {
-        // Nada: ya lo hace el ladrillo decorado
-    }
-
-
+    protected void initializeColor() {}
 }
