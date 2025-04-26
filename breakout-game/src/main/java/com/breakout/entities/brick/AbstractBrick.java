@@ -1,4 +1,4 @@
-package com.breakout.entites.brick;
+package com.breakout.entities.brick;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;

@@ -1,7 +1,8 @@
-package com.breakout.entites.ball;
+package com.breakout.entities.ball;
 
 import com.breakout.config.ConfigLoader;
-import com.breakout.core.GameApp;
+import com.breakout.entities.ball.strategy.BallMovementStrategy;
+import com.breakout.entities.ball.strategy.NormalMovementStrategy;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -11,20 +12,20 @@ public class Ball {
     private double dx, dy;
     private final double radius = 10;
 
+    private BallMovementStrategy movementStrategy;  // Agregamos el strategy
+
     public Ball(double startX, double startY) {
         this.x = startX;
         this.y = startY;
 
         this.dx = ConfigLoader.getInstance().getDouble("ball.speed");
         this.dy = this.dx;  // Usar la misma velocidad para el eje Y
+
+        this.movementStrategy = new NormalMovementStrategy();  // Valor por defecto
     }
 
     public void update() {
-        x += dx;
-        y += dy;
-
-        if (x <= 0 || x >= GameApp.WIDTH - radius) dx *= -1;
-        if (y <= 0 || y >= GameApp.HEIGHT - radius) dy *= -1;
+        movementStrategy.move(this);  // Delegar el movimiento al strategy
     }
 
     public void render(GraphicsContext gc) {
@@ -33,11 +34,25 @@ public class Ball {
     }
 
     public double getX() { return x; }
+    public void setX(double x) { this.x = x; }
+
     public double getY() { return y; }
+    public void setY(double y) { this.y = y; }
+
+    public double getDx() { return dx; }
+    public void setDx(double dx) { this.dx = dx; }
+
+    public double getDy() { return dy; }
+    public void setDy(double dy) { this.dy = dy; }
+
     public double getRadius() { return radius; }
 
     public void invertY() {
         dy *= -1;
+    }
+
+    public void setMovementStrategy(BallMovementStrategy strategy) {
+        this.movementStrategy = strategy;
     }
 
     // Método para obtener los límites de la pelota, útil para la detección de colisiones

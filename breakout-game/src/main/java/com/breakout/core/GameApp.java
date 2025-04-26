@@ -45,7 +45,8 @@ public class GameApp extends Application {
         primaryStage.setTitle(TITLE);
         primaryStage.setFullScreen(true);  // Pantalla completa
         primaryStage.setFullScreenExitHint(""); // Opcional
-        primaryStage.centerOnScreen(); // Centra automáticamente
+        primaryStage.centerOnScreen();
+        primaryStage.toFront();
 
     }
 

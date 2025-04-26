@@ -1,4 +1,4 @@
-package com.breakout.entites.paddle;
+package com.breakout.entities.paddle;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.core.GameApp;
