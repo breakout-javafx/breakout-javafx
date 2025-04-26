@@ -7,6 +7,7 @@ import com.breakout.entities.brick.BrickSpawner;
 import com.breakout.entities.paddle.Paddle;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,7 @@ public class GameLoop extends AnimationTimer {
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
+    private boolean gameStarted = false;
 
     // Control del tiempo
     private long lastUpdateTime = 0;
@@ -61,7 +63,13 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void updateBall() {
-        ball.update();
+        if (gameStarted) {
+            ball.update();
+        } else {
+            // Coloca la pelota justo encima del paddle si no ha comenzado el juego
+            ball.setX(paddle.getX() + paddle.getWidth() / 2 - ball.getRadius());
+            ball.setY(paddle.getY() - ball.getRadius() * 2);
+        }
     }
 
     private void updatePaddle() {
@@ -102,14 +110,26 @@ public class GameLoop extends AnimationTimer {
             brick.render(gc);
         }
 
-        // Dibujar el balón y el paddle
-        ball.render(gc);
+        // Dibujar el paddle y la pelota
         paddle.render(gc);
+        ball.render(gc);
+
+        // Mostrar texto si el juego aún no ha comenzado
+        if (!gameStarted) {
+            gc.setFill(Color.WHITE);
+            gc.fillText("Presiona ESPACIO para comenzar", GameApp.WIDTH / 2.0 - 100, GameApp.HEIGHT / 2.0);
+        }
     }
+
 
     // Métodos para manejar las teclas presionadas
     public void setLeftPressed(boolean b) { leftPressed = b; }
     public void setRightPressed(boolean b) { rightPressed = b; }
 
     public Paddle getPaddle() { return paddle; }
+
+    public void startGame() {
+        this.gameStarted = true;
+    }
+
 }
