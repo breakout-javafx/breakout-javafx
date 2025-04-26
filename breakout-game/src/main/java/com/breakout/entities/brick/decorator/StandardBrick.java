@@ -1,7 +1,7 @@
-package com.breakout.entites.brick.decorator;
+package com.breakout.entities.brick.decorator;
 
 import com.breakout.config.ConfigLoader;
-import com.breakout.entites.brick.AbstractBrick;
+import com.breakout.entities.brick.AbstractBrick;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 

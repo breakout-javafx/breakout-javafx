@@ -1,9 +1,9 @@
-package com.breakout.entites.brick;
+package com.breakout.entities.brick;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.core.GameApp;
-import com.breakout.entites.brick.decorator.GlowingBrickDecorator;
-import com.breakout.entites.brick.decorator.StandardBrick;
+import com.breakout.entities.brick.decorator.GlowingBrickDecorator;
+import com.breakout.entities.brick.decorator.StandardBrick;
 
 import java.util.ArrayList;
 import java.util.List;

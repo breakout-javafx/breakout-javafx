@@ -45,8 +45,12 @@
   *Diseñar el algoritmo de spawn de los mismos*  
   **Done by:** _[javi]_
 
+- [x] **Patron Strategy**  
+  *Implementación patrón strategy a Ball*  
+  **Done by:** _[javi]_
 
-- [ ] **Ajuste tamaño ventan juego**
+
+- [ ] **Ajuste tamaño ventan juego**  
   *Implementar el ajuste del tamaño de la ventana de juego (no ventana total) desde el .properties.*  
   **Done by:** _[Nombre del responsable]_
 
@@ -67,7 +71,11 @@
   **Done by:** _[Nombre del responsable]_
 
 - [ ] **Añadir decoratos Brick**  
-  *UDiseñar e implementar mas decoradores para brick. Añadirlos al algoritmo de generación. SI hay duda hablar ocn Javi.*  
+  *Diseñar e implementar mas decoradores para brick. Añadirlos al algoritmo de generación. SI hay duda hablar ocn Javi.*  
+  **Done by:** _[Nombre del responsable]_
+
+- [ ] **Añadir strategies Ball**  
+  *Diseñar e implementar estrategis de comportamiento para Ball. Implementarla con destrucción de bloques*    
   **Done by:** _[Nombre del responsable]_
 
 ---
@@ -91,6 +99,6 @@
 | **Singleton** | ConfigLoader                     |
 | **Decorator** | AbstractBrick                    |
 | **Template**  | AbstractBrick                    |
-| **Patrón 4**  | Descripción de dónde se ha usado |
+| **Strategy**  | Ball / NormalMovementStrategy    |
 | **Patrón 5**  | Descripción de dónde se ha usado |
 | **Patrón 6**  | Descripción de dónde se ha usado |

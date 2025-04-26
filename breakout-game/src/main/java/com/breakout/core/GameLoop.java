@@ -1,10 +1,10 @@
 package com.breakout.core;
 
 import com.breakout.config.ConfigLoader;
-import com.breakout.entites.ball.Ball;
-import com.breakout.entites.brick.AbstractBrick;
-import com.breakout.entites.brick.BrickSpawner;
-import com.breakout.entites.paddle.Paddle;
+import com.breakout.entities.ball.Ball;
+import com.breakout.entities.brick.AbstractBrick;
+import com.breakout.entities.brick.BrickSpawner;
+import com.breakout.entities.paddle.Paddle;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 
