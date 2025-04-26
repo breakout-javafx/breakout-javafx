@@ -10,6 +10,7 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class GameLoop extends AnimationTimer {
     private static final double NANOS_PER_UPDATE = 1_000_000_000.0 / TARGET_FPS;
 
     private final GraphicsContext gc;
-    private final Ball ball;
+    private final List<Ball> balls = new ArrayList<>();
     private final Paddle paddle;
     private List<AbstractBrick> bricks;
 
@@ -33,13 +34,16 @@ public class GameLoop extends AnimationTimer {
     public GameLoop(GraphicsContext gc) {
         this.gc = gc;
 
-        this.ball = new Ball(GameApp.WIDTH / 2.0, GameApp.HEIGHT / 2.0);
-
+        // Crear el paddle
         this.paddle = new Paddle(GameApp.WIDTH / 2.0 - (ConfigLoader.getInstance().getInt("paddle.width") / 2.0),
                 GameApp.HEIGHT - ConfigLoader.getInstance().getInt("paddle.height"));
 
+        Ball initialBall = new Ball(GameApp.WIDTH / 2.0, paddle.getY() - ConfigLoader.getInstance().getInt("ball.radius"));
+        balls.add(initialBall);
+
+        // Generar los ladrillos
         BrickSpawner brickSpawner = new BrickSpawner();
-        this.bricks = brickSpawner.generateBricks();
+        this.bricks = brickSpawner.generateBricks(this);
     }
 
     @Override
@@ -52,17 +56,18 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void update() {
-        updateBall();
+        updateBalls();
         updatePaddle();
         handleCollisions();
     }
 
-    private void updateBall() {
-        if (gameStarted) {
+    private void updateBalls() {
+        if (!gameStarted) {
+            return;
+        }
+
+        for (Ball ball : balls) {
             ball.update();
-        } else {
-            ball.setX(paddle.getX() + paddle.getWidth() / 2 - ball.getRadius());
-            ball.setY(paddle.getY() - ball.getRadius() * 2);
         }
     }
 
@@ -72,24 +77,28 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void handleCollisions() {
-        if (ball.getY() + ball.getRadius() >= paddle.getY() &&
-                ball.getX() + ball.getRadius() >= paddle.getX() &&
-                ball.getX() - ball.getRadius() <= paddle.getX() + paddle.getWidth()) {
-            ball.invertY();
+        // Colisiones con el paddle
+        for (Ball ball : balls) {
+            if (ball.getY() + ball.getRadius() >= paddle.getY() &&
+                    ball.getX() + ball.getRadius() >= paddle.getX() &&
+                    ball.getX() - ball.getRadius() <= paddle.getX() + paddle.getWidth()) {
+                ball.invertY();
+            }
         }
 
+        // Colisiones con los ladrillos
         Iterator<AbstractBrick> iterator = bricks.iterator();
         while (iterator.hasNext()) {
             AbstractBrick brick = iterator.next();
-            if (ball.getBounds().intersects(brick.getBounds())) {
-                brick.hit();
-
-                if (brick.isDestroyed()) {
-                    addScore(brick.getScore());
-                    iterator.remove();
+            for (Ball ball : balls) {
+                if (ball.getBounds().intersects(brick.getBounds())) {
+                    brick.hit();
+                    if (brick.isDestroyed()) {
+                        addScore(brick.getScore());
+                        iterator.remove();
+                    }
+                    ball.invertY();
                 }
-
-                ball.invertY();
             }
         }
     }
@@ -97,24 +106,34 @@ public class GameLoop extends AnimationTimer {
     private void render() {
         gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
 
+        // Dibujar el borde
         gc.setStroke(Color.BLACK);
         gc.strokeRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
 
+        // Dibujar los ladrillos
         for (AbstractBrick brick : bricks) {
             brick.render(gc);
         }
 
-        paddle.render(gc);
-        ball.render(gc);
+        // Dibujar todas las bolas
+        for (Ball ball : balls) {
+            ball.render(gc);
+        }
 
+        // Dibujar el paddle
+        paddle.render(gc);
+
+        // Mostrar la puntuación
         gc.setFill(Color.BLACK);
         gc.fillText("Score: " + totalScore, 20, 30);
 
+        // Mostrar vidas
         int lives = LifeManager.getInstance().getLives();
         for (int i = 0; i < lives; i++) {
             drawHeart(gc, 120 + i * 30, 15, 20);
         }
 
+        // Mensaje inicial
         if (!gameStarted) {
             String message = "Presiona ESPACIO para comenzar";
 
@@ -159,4 +178,9 @@ public class GameLoop extends AnimationTimer {
     public void startGame() {
         this.gameStarted = true;
     }
+
+    public void addBall(Ball ball) {
+        balls.add(ball);
+    }
+
 }

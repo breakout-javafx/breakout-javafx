@@ -50,25 +50,31 @@
 
 - [x] **Algoritmo spawn brick**  
   *Diseñar el algoritmo de spawn de los mismos*  
-  **Done by:** _[Javi]_
+  **Done by:** _[Javi]_  
 
 - [x] **Patron Strategy**  
   *Implementación patrón strategy a Ball*  
-  **Done by:** _[Javi]_
+  **Done by:** _[Javi]_  
 
 - [x] **Posición Ball al empezar**  
   *La pelota se mueve a donde este el Paddle. Solo al pulsar espacio la partida comienza*  
-  **Done by:** _[Javi]_
+  **Done by:** _[Javi]_  
+
+- [x] **Decorator para pelotas y spawn de muchas bolas**  
+  *Añadir la lógica de generación de múltiples pelotas y la integración con el patrón Decorator para modificar su comportamiento.*  
+  **Done by:** _[Javi]_  
+
+- [ ] **Gestionar la lógica de eliminación y finalización de la partida**  
+  *Encargarse de que se use el setting de radio de bola al generar la bola. Implementar la lógica de eliminación de bolas al tocar la base de la pantalla y finalizar la partida si nos quedamos sin bolas.*
+  **Done by:** _[Nombre del responsable]_  
 
 - [ ] **Ajuste tamaño ventan juego**  
   *Implementar el ajuste del tamaño de la ventana de juego (no ventana total) desde el .properties.*  
-  **Done by:** _[Nombre del responsable]_
-- 
-
+  **Done by:** _[Nombre del responsable]_  
 
 - [ ] **Score tracker**  
   *Investigar, crear e implentar la tabla de puntuación y su lógica*  
-  **Done by:** _[Nombre del responsable]_
+  **Done by:** _[Nombre del responsable]_  
 
 ---
 

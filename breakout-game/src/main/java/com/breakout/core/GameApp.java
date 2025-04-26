@@ -16,6 +16,11 @@ public class GameApp extends Application {
     public static int HEIGHT;
     private static final String TITLE = ConfigLoader.getInstance().get("game.tittle");
 
+
+    //TODO ENCARGARSE DE QUE SE USE EL SEETING DE REDIO DE BOLA AL GENERAR LA BOLA
+    //LÓGICA DE ELIMINAR BOLAS AL TOCAR LA BASE DE LA PANTALLA
+    //LÓGICA DE TERMINAR PARTIDA SI NOS QUEDAMOS SIN BOLAS
+
     @Override
     public void start(Stage primaryStage) {
         // Configuración base
