@@ -8,9 +8,8 @@ public abstract class BrickDecorator extends AbstractBrick {
 
     public BrickDecorator(AbstractBrick decoratedBrick) {
         super(decoratedBrick.getX(), decoratedBrick.getY(),
-              decoratedBrick.getWidth(), decoratedBrick.getHeight());
+                decoratedBrick.getWidth(), decoratedBrick.getHeight());
         this.decoratedBrick = decoratedBrick;
-        // No sumamos aquí — cada decorador específico ajusta el score como quiera
     }
 
     @Override
@@ -26,5 +25,15 @@ public abstract class BrickDecorator extends AbstractBrick {
     @Override
     public boolean isDestroyed() {
         return decoratedBrick.isDestroyed();
+    }
+
+    @Override
+    protected void initializeShape() {
+        // No cambia la forma
+    }
+
+    @Override
+    protected void initializeColor() {
+        // No cambia el color
     }
 }

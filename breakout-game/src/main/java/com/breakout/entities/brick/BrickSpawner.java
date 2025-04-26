@@ -3,7 +3,9 @@ package com.breakout.entities.brick;
 import com.breakout.config.ConfigLoader;
 import com.breakout.core.GameApp;
 import com.breakout.entities.brick.decorator.GlowingBrickDecorator;
+import com.breakout.entities.brick.decorator.MultiBallBrickDecorator;
 import com.breakout.entities.brick.decorator.StandardBrick;
+import com.breakout.core.GameLoop;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +27,13 @@ public class BrickSpawner {
 
     private Random random = new Random();
 
-    public List<AbstractBrick> generateBricks() {
+    public List<AbstractBrick> generateBricks(GameLoop gameLoop) {
         List<AbstractBrick> bricks = new ArrayList<>();
-        generateClusterRecursive(bricks, 0, totalClusters);
+        generateClusterRecursive(bricks, 0, totalClusters, gameLoop);
         return bricks;
     }
 
-    private void generateClusterRecursive(List<AbstractBrick> bricks, int currentCluster, int maxClusters) {
+    private void generateClusterRecursive(List<AbstractBrick> bricks, int currentCluster, int maxClusters, GameLoop gameLoop) {
         if (currentCluster >= maxClusters) return;  // Caso base, terminamos si hemos generado todos los clusters.
 
         // Generar una posición aleatoria para el centro del cluster
@@ -61,7 +63,7 @@ public class BrickSpawner {
                 if (isPositionAvailable(brickX, brickY, bricks, brickWidth, brickHeight)) {
                     // Aplicar la decoración aleatoria
                     AbstractBrick brick = new StandardBrick(brickX, brickY, brickWidth, brickHeight);
-                    brick = applyRandomDecorator(brick); // Aplicar el decorador aleatorio
+                    brick = applyRandomDecorator(brick, gameLoop); // Pasamos el gameLoop al decorador
 
                     bricks.add(brick);
                     blocksGenerated++;
@@ -83,15 +85,20 @@ public class BrickSpawner {
         System.out.println("Cluster " + (currentCluster + 1) + ": Generados: " + blocksGenerated + ", Fallidos: " + blocksFailed);
 
         // Recursivamente generar el siguiente cluster
-        generateClusterRecursive(bricks, currentCluster + 1, maxClusters);
+        generateClusterRecursive(bricks, currentCluster + 1, maxClusters, gameLoop);
     }
 
-
-
-    private AbstractBrick applyRandomDecorator(AbstractBrick brick) {
+    private AbstractBrick applyRandomDecorator(AbstractBrick brick, GameLoop gameLoop) {
         // 50% de probabilidad de aplicar un decorador
         if (random.nextBoolean()) {
-            return new GlowingBrickDecorator(brick); // Puedes añadir más decoradores aquí
+            // Probabilidad de aplicar GlowingBrickDecorator
+            if (random.nextBoolean()) {
+                return new GlowingBrickDecorator(brick);
+            }
+            // Probabilidad de aplicar MultiBallBrickDecorator
+            else {
+                return new MultiBallBrickDecorator(brick, gameLoop);  // Pasamos gameLoop
+            }
         }
         return brick;  // Si no, devolvemos el brick sin decorador.
     }
