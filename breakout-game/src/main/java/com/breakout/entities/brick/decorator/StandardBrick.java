@@ -9,22 +9,19 @@ public class StandardBrick extends AbstractBrick {
     private Color color;
 
     public StandardBrick(double x, double y, double width, double height) {
-        super(
-                x,
-                y,
-                ConfigLoader.getInstance().getInt("brick.width"),
-                ConfigLoader.getInstance().getInt("brick.height")
-        );
+        super(x, y,
+              ConfigLoader.getInstance().getInt("brick.width"),
+              ConfigLoader.getInstance().getInt("brick.height"));
+        this.score = 10; // Score base
+        this.health = 1; // Vida base
     }
 
     @Override
-    protected void initializeShape() {
-        // No hay forma compleja, el rectángulo es suficiente
-    }
+    protected void initializeShape() {}
 
     @Override
     protected void initializeColor() {
-        this.color = Color.RED; // Color base del ladrillo estándar
+        this.color = Color.RED;
     }
 
     @Override
