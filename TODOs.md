@@ -15,10 +15,17 @@
   *Añadir control para la tasa de frames por segundo para asegurar que el juego corra de manera fluida en todas las plataformas.*  
   **Done by:** _[javi]_
 
+- [x] **Mapa, Paredes y Colisiones**  
+  *Añadir un sistema de detección de paredes, para contemplar top/right/left/bottom y que sea lo suficientemente abstracto como para permitir en un futuro controlar las vidas*  
+  **Done by:** _[alvaro]_
+
+- [x] **Control vidas**  
+  *Añadir algún item reutilizable que permita controlar cuántas vidas quedan y asegurar una interconexión con las clases wall*  
+  **Done by:** _[alvaro]_
 
 - [x] **Lógica de rebotes de la pelota**  
   *Asegurar la lógica básica de rebote.*  
-  **Done by:** _[javi]_
+  **Done by:** _[javi & alvaro]_
 
 
 - [x] **Ajustar tamaño de la ventana del juego**  
