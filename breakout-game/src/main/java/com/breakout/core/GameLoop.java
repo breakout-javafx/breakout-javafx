@@ -5,6 +5,8 @@ import com.breakout.entities.ball.Ball;
 import com.breakout.entities.brick.AbstractBrick;
 import com.breakout.entities.brick.BrickSpawner;
 import com.breakout.entities.paddle.Paddle;
+import com.breakout.manager.LifeManager;
+
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -98,28 +100,56 @@ public class GameLoop extends AnimationTimer {
         }
     }
 
-    private void render() {
-        // Limpiar el canvas
-        gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
+private void render() {
+    // Limpiar el canvas
+    gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
 
-        // Dibujar el borde alrededor del área de juego
-        gc.strokeRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT); // Borde alrededor del canvas
+    // Dibujar el borde alrededor del área de juego
+    gc.setStroke(Color.BLACK);
+    gc.strokeRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT); // Borde negro del área de juego
 
-        // Dibujar los bricks
-        for (AbstractBrick brick : bricks) {
-            brick.render(gc);
-        }
-
-        // Dibujar el paddle y la pelota
-        paddle.render(gc);
-        ball.render(gc);
-
-        // Mostrar texto si el juego aún no ha comenzado
-        if (!gameStarted) {
-            gc.setFill(Color.WHITE);
-            gc.fillText("Presiona ESPACIO para comenzar", GameApp.WIDTH / 2.0 - 100, GameApp.HEIGHT / 2.0);
-        }
+    // Dibujar los bricks
+    for (AbstractBrick brick : bricks) {
+        brick.render(gc);
     }
+
+    // Dibujar el paddle y la pelota
+    paddle.render(gc);
+    ball.render(gc);
+
+    // Dibujar Score
+    gc.setFill(Color.WHITE);
+    gc.fillText("Score: " + ball.getScore(), 20, 30); // Asumiendo que Ball tiene getScore()
+
+    // Dibujar Vidas como corazones
+    int lives = LifeManager.getInstance().getLives();
+    for (int i = 0; i < lives; i++) {
+        drawHeart(gc, 120 + i * 30, 15, 20); // Separa cada corazón 30px
+    }
+
+    // Mostrar texto si el juego aún no ha comenzado
+    if (!gameStarted) {
+        String message = "Presiona ESPACIO para comenzar";
+
+        double fontSize = gc.getFont().getSize();
+        double textWidth = fontSize * message.length() * 0.5;
+        double textHeight = fontSize;
+
+        double rectX = GameApp.WIDTH / 2.0 - textWidth / 2 - 10;
+        double rectY = GameApp.HEIGHT / 2.0 - textHeight / 2 - 10;
+        double rectWidth = textWidth + 20;
+        double rectHeight = textHeight + 20;
+
+        gc.setFill(Color.DIMGRAY);
+        gc.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+        gc.setFill(Color.WHITE);
+        gc.fillText(message, GameApp.WIDTH / 2.0 - textWidth / 2, GameApp.HEIGHT / 2.0 + textHeight / 4);
+    }
+}
+
+    
+    
 
 
     // Métodos para manejar las teclas presionadas

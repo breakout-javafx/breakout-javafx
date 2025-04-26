@@ -13,15 +13,15 @@
 
 - [x] **Control de FPS**  
   *Añadir control para la tasa de frames por segundo para asegurar que el juego corra de manera fluida en todas las plataformas.*  
-  **Done by:** _[javi]_
+  **Done by:** _[Javi]_
 
 - [x] **Mapa, Paredes y Colisiones**  
   *Añadir un sistema de detección de paredes, para contemplar top/right/left/bottom y que sea lo suficientemente abstracto como para permitir en un futuro controlar las vidas*  
-  **Done by:** _[alvaro]_
+  **Done by:** _[Álvaro]_
 
 - [x] **Control vidas**  
   *Añadir algún item reutilizable que permita controlar cuántas vidas quedan y asegurar una interconexión con las clases wall*  
-  **Done by:** _[alvaro]_
+  **Done by:** _[Álvaro]_
 
 - [x] **Lógica de rebotes de la pelota**  
   *Asegurar la lógica básica de rebote.*  
@@ -30,12 +30,12 @@
 
 - [x] **Ajustar tamaño de la ventana del juego**  
   *La ventana se inicializa en pantalla completa. El panel de juego es más pequeño que la pantalla.*  
-  **Done by:** _[javi]_
+  **Done by:** _[Javi]_
 
 
 - [x] **Añadir delimitadores del panel de juego (bordes)**  
   *Dibujar los bordel del panel de juego para que se vean de forma clara los límites*  
-  **Done by:** _[Javi]_
+  **Done by:** _[Javi & Álvaro]_
 
 
 - [x] **Cambiar pos inical de paddle**  
@@ -45,20 +45,20 @@
 
 - [x] **Creación de bricks**  
   *Crear el objeto brick implementado patrones de uso*  
-  **Done by:** _[javi]_
+  **Done by:** _[Javi]_
 
 
 - [x] **Algoritmo spawn brick**  
   *Diseñar el algoritmo de spawn de los mismos*  
-  **Done by:** _[javi]_
+  **Done by:** _[Javi]_
 
 - [x] **Patron Strategy**  
   *Implementación patrón strategy a Ball*  
-  **Done by:** _[javi]_
+  **Done by:** _[Javi]_
 
 - [x] **Posición Ball al empezar**  
-  *La pelota se mueve a donde este el Paddel. Solo al pulsar espacio la partida comienza*  
-  **Done by:** _[javi]_
+  *La pelota se mueve a donde este el Paddle. Solo al pulsar espacio la partida comienza*  
+  **Done by:** _[Javi]_
 
 - [ ] **Ajuste tamaño ventan juego**  
   *Implementar el ajuste del tamaño de la ventana de juego (no ventana total) desde el .properties.*  
