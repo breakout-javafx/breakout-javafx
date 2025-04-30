@@ -7,8 +7,11 @@ import com.breakout.entities.brick.BrickSpawner;
 import com.breakout.entities.paddle.Paddle;
 import com.breakout.manager.LifeManager;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,6 +30,7 @@ public class GameLoop extends AnimationTimer {
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private boolean gameStarted = false;
+    private boolean gameOver = false;
 
     private long lastUpdateTime = 0;
     private int totalScore = 0;
@@ -56,18 +60,29 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void update() {
+        if (!gameStarted || gameOver) return; // No actualizar si no ha empezado el juego o si es game over
+
         updateBalls();
         updatePaddle();
         handleCollisions();
     }
 
     private void updateBalls() {
-        if (!gameStarted) {
-            return;
+        Iterator<Ball> iterator = balls.iterator();
+        boolean ballLost = false;
+
+        while (iterator.hasNext()) {
+            Ball ball = iterator.next();
+            ball.update();
+            
+            if (!ball.isActive()) {
+                iterator.remove();
+                ballLost = true;
+            }
         }
 
-        for (Ball ball : balls) {
-            ball.update();
+        if (ballLost) {
+            handleBallLost();
         }
     }
 
@@ -106,6 +121,31 @@ public class GameLoop extends AnimationTimer {
     private void render() {
         gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
 
+        if (!gameOver && gameStarted) {
+            renderGameElements();
+        }
+        if (gameOver) {
+            renderGameOver();
+        } else if (!gameStarted) {
+            renderStartMessage();
+        }
+
+    }
+
+    public void renderGameOver () {
+        gc.setFill(Color.RED);
+        gc.setFont(new Font(48));
+        String text = "GAME OVER - Score: " + totalScore;
+        double textWidth = calculateTextWidth(text, gc.getFont());
+        gc.fillText(text, (GameApp.WIDTH - textWidth)/2, GameApp.HEIGHT/2);
+        
+        gc.setFont(new Font(24));
+        String restartText = "Press SPACE to restart";
+        double restartWidth = calculateTextWidth(restartText, gc.getFont());
+        gc.fillText(restartText, (GameApp.WIDTH - restartWidth)/2, GameApp.HEIGHT/2 + 50);
+    }
+
+    public void renderGameElements () {
         // Dibujar el borde
         gc.setStroke(Color.BLACK);
         gc.strokeRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
@@ -132,7 +172,9 @@ public class GameLoop extends AnimationTimer {
         for (int i = 0; i < lives; i++) {
             drawHeart(gc, 120 + i * 30, 15, 20);
         }
+    }
 
+    public void renderStartMessage () {
         // Mensaje inicial
         if (!gameStarted) {
             String message = "Presiona ESPACIO para comenzar";
@@ -176,11 +218,82 @@ public class GameLoop extends AnimationTimer {
     public Paddle getPaddle() { return paddle; }
 
     public void startGame() {
-        this.gameStarted = true;
+        if (gameOver) {
+            // Si es game over reinicia el juego
+            resetGame();
+            gameStarted = true;
+        } else if (!gameStarted) {
+            // Si el juego no ha comenzado, iniciarlo
+            gameStarted = true;
+
+            // Asegurar que al menos hay una bola
+            if (balls.isEmpty()) {
+                spawnNewBall();
+            }
+        }
     }
 
     public void addBall(Ball ball) {
         balls.add(ball);
     }
 
+    private void handleBallLost() {
+        if (balls.isEmpty()) {
+            if (LifeManager.getInstance().getLives() > 0) {
+                // Reiniciar con una nueva bola
+                spawnNewBall();
+                gameStarted = false; // Pausar el juego
+            } else {
+                gameOver();
+            }
+        }
+    }
+
+    private void spawnNewBall() {
+        Ball newBall = new Ball(paddle.getX() + paddle.getWidth()/2, paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius"));
+        balls.add(newBall);
+        gameStarted = false;
+    }
+
+    private void gameOver() {
+        gameOver = true;  
+    }
+
+    private void showGameOverMessage() {
+        Platform.runLater(() -> {
+            gc.setFill(Color.RED);
+            gc.setFont(new Font(48));
+            gc.fillText("GAME OVER", 
+                GameApp.WIDTH/2 - 120, 
+                GameApp.HEIGHT/2);
+        });
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void resetGame() {
+        // Reiniciar todos los estados
+        balls.clear();
+        bricks = new BrickSpawner().generateBricks(this);
+        totalScore = 0;
+        LifeManager.getInstance().reset();
+
+        gameStarted = false;
+        gameOver = false;
+
+        Ball newBall = new Ball (paddle.getX() + paddle.getWidth() / 2, paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius"));
+        balls.add(newBall);
+
+        // Reiniciar la posición del paddle
+        paddle.resetPosition();
+        System.out.println("Juego Reiniciado"); // Debug
+    }
+
+    private double calculateTextWidth(String text, Font font) {
+        Text helper = new Text(text);
+        helper.setFont(font);
+        return helper.getLayoutBounds().getWidth();
+    }
 }

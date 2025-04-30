@@ -21,6 +21,8 @@ public class NormalMovementStrategy implements BallMovementStrategy {
 
     @Override
     public void move(Ball ball) {
+        if (!ball.isActive()) return; // No muevo bolas inactivas
+
         ball.setX(ball.getX() + ball.getDx());
         ball.setY(ball.getY() + ball.getDy());
 

@@ -1,5 +1,7 @@
 package com.breakout.manager;
 
+import com.breakout.config.ConfigLoader;
+
 public class LifeManager {
 
     private static LifeManager instance;
@@ -41,5 +43,9 @@ public class LifeManager {
     private void onLivesDepleted() {
         System.out.println("¡Juego terminado! Has perdido todas tus vidas.");
         // Aquí más adelante puedes implementar el fin de la partida o la transición a pantalla de Game Over
+    }
+
+    public void reset() {
+        this.lives = ConfigLoader.getInstance().getInt("initial.lives");
     }
 }
