@@ -2,6 +2,7 @@ package com.breakout.core;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.entities.ball.Ball;
+import com.breakout.entities.ball.BallSpawner;
 import com.breakout.entities.brick.AbstractBrick;
 import com.breakout.entities.brick.BrickSpawner;
 import com.breakout.entities.paddle.Paddle;
@@ -27,6 +28,8 @@ public class GameLoop extends AnimationTimer {
     private final Paddle paddle;
     private List<AbstractBrick> bricks;
 
+    private final BallSpawner ballSpawner; // ✅ NUEVO
+
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private boolean gameStarted = false;
@@ -38,16 +41,21 @@ public class GameLoop extends AnimationTimer {
     public GameLoop(GraphicsContext gc) {
         this.gc = gc;
 
-        // Crear el paddle
-        this.paddle = new Paddle(GameApp.WIDTH / 2.0 - (ConfigLoader.getInstance().getInt("paddle.width") / 2.0),
-                GameApp.HEIGHT - ConfigLoader.getInstance().getInt("paddle.height"));
+        this.paddle = new Paddle(
+                GameApp.WIDTH / 2.0 - (ConfigLoader.getInstance().getInt("paddle.width") / 2.0),
+                GameApp.HEIGHT - ConfigLoader.getInstance().getInt("paddle.height")
+        );
 
-        Ball initialBall = new Ball(GameApp.WIDTH / 2.0, paddle.getY() - ConfigLoader.getInstance().getInt("ball.radius"));
+        this.ballSpawner = new BallSpawner(); // ✅
+
+        Ball initialBall = ballSpawner.spawnBall(
+                GameApp.WIDTH / 2.0,
+                paddle.getY() - ConfigLoader.getInstance().getInt("ball.radius")
+        );
         balls.add(initialBall);
 
-        // Generar los ladrillos
-        BrickSpawner brickSpawner = new BrickSpawner();
-        this.bricks = brickSpawner.generateBricks(this);
+        this.bricks = new BrickSpawner().generateBricks(this, ballSpawner);
+
     }
 
     @Override
@@ -60,7 +68,7 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void update() {
-        if (!gameStarted || gameOver) return; // No actualizar si no ha empezado el juego o si es game over
+        if (!gameStarted || gameOver) return;
 
         updateBalls();
         updatePaddle();
@@ -74,7 +82,7 @@ public class GameLoop extends AnimationTimer {
         while (iterator.hasNext()) {
             Ball ball = iterator.next();
             ball.update();
-            
+
             if (!ball.isActive()) {
                 iterator.remove();
                 ballLost = true;
@@ -92,7 +100,6 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void handleCollisions() {
-        // Colisiones con el paddle
         for (Ball ball : balls) {
             if (ball.getY() + ball.getRadius() >= paddle.getY() &&
                     ball.getX() + ball.getRadius() >= paddle.getX() &&
@@ -101,7 +108,6 @@ public class GameLoop extends AnimationTimer {
             }
         }
 
-        // Colisiones con los ladrillos
         Iterator<AbstractBrick> iterator = bricks.iterator();
         while (iterator.hasNext()) {
             AbstractBrick brick = iterator.next();
@@ -129,71 +135,61 @@ public class GameLoop extends AnimationTimer {
         } else if (!gameStarted) {
             renderStartMessage();
         }
-
     }
 
-    public void renderGameOver () {
+    public void renderGameOver() {
         gc.setFill(Color.RED);
         gc.setFont(new Font(48));
         String text = "GAME OVER - Score: " + totalScore;
         double textWidth = calculateTextWidth(text, gc.getFont());
-        gc.fillText(text, (GameApp.WIDTH - textWidth)/2, GameApp.HEIGHT/2);
-        
+        gc.fillText(text, (GameApp.WIDTH - textWidth) / 2, GameApp.HEIGHT / 2);
+
         gc.setFont(new Font(24));
         String restartText = "Press SPACE to restart";
         double restartWidth = calculateTextWidth(restartText, gc.getFont());
-        gc.fillText(restartText, (GameApp.WIDTH - restartWidth)/2, GameApp.HEIGHT/2 + 50);
+        gc.fillText(restartText, (GameApp.WIDTH - restartWidth) / 2, GameApp.HEIGHT / 2 + 50);
     }
 
-    public void renderGameElements () {
-        // Dibujar el borde
+    public void renderGameElements() {
         gc.setStroke(Color.BLACK);
         gc.strokeRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
 
-        // Dibujar los ladrillos
         for (AbstractBrick brick : bricks) {
             brick.render(gc);
         }
 
-        // Dibujar todas las bolas
         for (Ball ball : balls) {
             ball.render(gc);
         }
 
-        // Dibujar el paddle
         paddle.render(gc);
 
-        // Mostrar la puntuación
         gc.setFill(Color.BLACK);
         gc.fillText("Score: " + totalScore, 20, 30);
 
-        // Mostrar vidas
         int lives = LifeManager.getInstance().getLives();
         for (int i = 0; i < lives; i++) {
             drawHeart(gc, 120 + i * 30, 15, 20);
         }
     }
 
-    public void renderStartMessage () {
-        // Mensaje inicial
-        if (!gameStarted) {
-            String message = "Presiona ESPACIO para comenzar";
+    public void renderStartMessage() {
+        String message = "Presiona ESPACIO para comenzar";
 
-            double fontSize = gc.getFont().getSize();
-            double textWidth = fontSize * message.length() * 0.5;
-            double textHeight = fontSize;
+        double fontSize = gc.getFont().getSize();
+        double textWidth = fontSize * message.length() * 0.5;
+        double textHeight = fontSize;
 
-            double rectX = GameApp.WIDTH / 2.0 - textWidth / 2 - 10;
-            double rectY = GameApp.HEIGHT / 2.0 - textHeight / 2 - 10;
-            double rectWidth = textWidth + 20;
-            double rectHeight = textHeight + 20;
+        double rectX = GameApp.WIDTH / 2.0 - textWidth / 2 - 10;
+        double rectY = GameApp.HEIGHT / 2.0 - textHeight / 2 - 10;
+        double rectWidth = textWidth + 20;
+        double rectHeight = textHeight + 20;
 
-            gc.setFill(Color.DIMGRAY);
-            gc.fillRect(rectX, rectY, rectWidth, rectHeight);
+        gc.setFill(Color.DIMGRAY);
+        gc.fillRect(rectX, rectY, rectWidth, rectHeight);
 
-            gc.setFill(Color.WHITE);
-            gc.fillText(message, GameApp.WIDTH / 2.0 - textWidth / 2, GameApp.HEIGHT / 2.0 + textHeight / 4);
-        }
+        gc.setFill(Color.WHITE);
+        gc.fillText(message, GameApp.WIDTH / 2.0 - textWidth / 2, GameApp.HEIGHT / 2.0 + textHeight / 4);
     }
 
     private void addScore(int points) {
@@ -219,14 +215,10 @@ public class GameLoop extends AnimationTimer {
 
     public void startGame() {
         if (gameOver) {
-            // Si es game over reinicia el juego
             resetGame();
             gameStarted = true;
         } else if (!gameStarted) {
-            // Si el juego no ha comenzado, iniciarlo
             gameStarted = true;
-
-            // Asegurar que al menos hay una bola
             if (balls.isEmpty()) {
                 spawnNewBall();
             }
@@ -240,9 +232,8 @@ public class GameLoop extends AnimationTimer {
     private void handleBallLost() {
         if (balls.isEmpty()) {
             if (LifeManager.getInstance().getLives() > 0) {
-                // Reiniciar con una nueva bola
                 spawnNewBall();
-                gameStarted = false; // Pausar el juego
+                gameStarted = false;
             } else {
                 gameOver();
             }
@@ -250,23 +241,16 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void spawnNewBall() {
-        Ball newBall = new Ball(paddle.getX() + paddle.getWidth()/2, paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius"));
+        Ball newBall = ballSpawner.spawnBall(
+                paddle.getX() + paddle.getWidth() / 2,
+                paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius")
+        );
         balls.add(newBall);
         gameStarted = false;
     }
 
     private void gameOver() {
-        gameOver = true;  
-    }
-
-    private void showGameOverMessage() {
-        Platform.runLater(() -> {
-            gc.setFill(Color.RED);
-            gc.setFont(new Font(48));
-            gc.fillText("GAME OVER", 
-                GameApp.WIDTH/2 - 120, 
-                GameApp.HEIGHT/2);
-        });
+        gameOver = true;
     }
 
     public boolean isGameOver() {
@@ -274,26 +258,32 @@ public class GameLoop extends AnimationTimer {
     }
 
     public void resetGame() {
-        // Reiniciar todos los estados
         balls.clear();
-        bricks = new BrickSpawner().generateBricks(this);
+        bricks = new BrickSpawner().generateBricks(this, ballSpawner);
+
         totalScore = 0;
         LifeManager.getInstance().reset();
 
         gameStarted = false;
         gameOver = false;
 
-        Ball newBall = new Ball (paddle.getX() + paddle.getWidth() / 2, paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius"));
+        Ball newBall = ballSpawner.spawnBall(
+                paddle.getX() + paddle.getWidth() / 2,
+                paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius")
+        );
         balls.add(newBall);
 
-        // Reiniciar la posición del paddle
         paddle.resetPosition();
-        System.out.println("Juego Reiniciado"); // Debug
+        System.out.println("Juego Reiniciado");
     }
 
     private double calculateTextWidth(String text, Font font) {
         Text helper = new Text(text);
         helper.setFont(font);
         return helper.getLayoutBounds().getWidth();
+    }
+
+    public BallSpawner getBallSpawner() {
+        return ballSpawner; // ✅ para decoradores y otras clases
     }
 }

@@ -2,9 +2,9 @@ package com.breakout.entities.brick.decorator;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.entities.ball.Ball;
+import com.breakout.entities.ball.BallSpawner;
 import com.breakout.core.GameLoop;
 import com.breakout.entities.brick.AbstractBrick;
-import com.breakout.entities.brick.decorator.BrickDecorator;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -12,11 +12,13 @@ import java.util.Random;
 
 public class MultiBallBrickDecorator extends BrickDecorator {
     private final GameLoop gameLoop;
+    private final BallSpawner ballSpawner;
     private boolean triggered = false;
 
-    public MultiBallBrickDecorator(AbstractBrick decoratedBrick, GameLoop gameLoop) {
+    public MultiBallBrickDecorator(AbstractBrick decoratedBrick, GameLoop gameLoop, BallSpawner ballSpawner) {
         super(decoratedBrick);
         this.gameLoop = gameLoop;
+        this.ballSpawner = ballSpawner;
     }
 
     @Override
@@ -30,29 +32,23 @@ public class MultiBallBrickDecorator extends BrickDecorator {
     }
 
     private void spawnExtraBalls() {
-        Ball originBall = new Ball(x + width / 2, y);
         Random rand = new Random();
-
         double speed = ConfigLoader.getInstance().getDouble("ball.speed");
         int extraBalls = ConfigLoader.getInstance().getInt("ball.extraspawn");
 
         for (int i = 0; i < extraBalls; i++) {
-            Ball newBall = new Ball(originBall.getX(), originBall.getY());
-
-            // Ajusta la velocidad usando el valor de ball.speed
-            newBall.setDx(rand.nextBoolean() ? speed : -speed);  // Velocidad aleatoria en X
-            newBall.setDy(speed);  // Velocidad en Y
-
+            Ball newBall = ballSpawner.spawnBall(x + width / 2, y);
+            newBall.setDx(rand.nextBoolean() ? speed : -speed);
+            newBall.setDy(speed);
             gameLoop.addBall(newBall);
         }
     }
 
     @Override
     public void render(GraphicsContext gc) {
-        super.render(gc);  // Dibuja el ladrillo base
+        super.render(gc);
 
-        // Añadir un distintivo visual, como un círculo en el centro del ladrillo
-        gc.setFill(Color.BLUE);  // Color distintivo para los bricks multi-ball
-        gc.fillOval(x + width / 4, y + height / 4, width / 2, height / 2);  // Círculo en el centro
+        gc.setFill(Color.BLUE);
+        gc.fillOval(x + width / 4, y + height / 4, width / 2, height / 2);
     }
 }

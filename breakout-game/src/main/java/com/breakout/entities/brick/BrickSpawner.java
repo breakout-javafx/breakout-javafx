@@ -2,10 +2,11 @@ package com.breakout.entities.brick;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.core.GameApp;
+import com.breakout.core.GameLoop;
+import com.breakout.entities.ball.BallSpawner;
 import com.breakout.entities.brick.decorator.GlowingBrickDecorator;
 import com.breakout.entities.brick.decorator.MultiBallBrickDecorator;
 import com.breakout.entities.brick.decorator.StandardBrick;
-import com.breakout.core.GameLoop;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,6 @@ public class BrickSpawner {
     private static final int clusterSize = ConfigLoader.getInstance().getInt("brick.generation.clustersize");
     private static final int minDistanceFromPaddle = ConfigLoader.getInstance().getInt("brick.generation.mindistancefrompaddle");
 
-    // Nueva configuración para la variación de los bricks dentro de un cluster
     private static final double offsetXMax = ConfigLoader.getInstance().getInt("brick.generation.offsetX");
     private static final double offsetYMax = ConfigLoader.getInstance().getInt("brick.generation.offsetY");
 
@@ -25,45 +25,39 @@ public class BrickSpawner {
 
     private static final int maxRetries = ConfigLoader.getInstance().getInt("brick.generation.maxretries");
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
-    public List<AbstractBrick> generateBricks(GameLoop gameLoop) {
+    public List<AbstractBrick> generateBricks(GameLoop gameLoop, BallSpawner ballSpawner) {
         List<AbstractBrick> bricks = new ArrayList<>();
-        generateClusterRecursive(bricks, 0, totalClusters, gameLoop);
+        generateClusterRecursive(bricks, 0, totalClusters, gameLoop, ballSpawner);
         return bricks;
     }
 
-    private void generateClusterRecursive(List<AbstractBrick> bricks, int currentCluster, int maxClusters, GameLoop gameLoop) {
-        if (currentCluster >= maxClusters) return;  // Caso base, terminamos si hemos generado todos los clusters.
+    private void generateClusterRecursive(List<AbstractBrick> bricks, int currentCluster, int maxClusters,
+                                          GameLoop gameLoop, BallSpawner ballSpawner) {
+        if (currentCluster >= maxClusters) return;
 
-        // Generar una posición aleatoria para el centro del cluster
         double paddleY = GameApp.HEIGHT - minDistanceFromPaddle;
         double centerX = random.nextDouble() * (GameApp.WIDTH - brickWidth);
-        double centerY = random.nextDouble() * (paddleY - brickHeight);  // Aseguramos que no se sobrepase el paddle.
+        double centerY = random.nextDouble() * (paddleY - brickHeight);
 
-        // Contadores
         int blocksGenerated = 0;
         int blocksFailed = 0;
 
-        // Generar los bricks dentro del cluster
         for (int i = 0; i < clusterSize; i++) {
             boolean positionFound = false;
             int retryCount = 0;
 
-            // Intentar encontrar una posición disponible para el bloque, ampliando el área de búsqueda
             while (!positionFound && retryCount < maxRetries) {
-                double offsetX = random.nextDouble() * offsetXMax - (offsetXMax / 2);  // Variación en X dentro del cluster
-                double offsetY = random.nextDouble() * offsetYMax - (offsetYMax / 2);  // Variación en Y dentro del cluster
+                double offsetX = random.nextDouble() * offsetXMax - (offsetXMax / 2);
+                double offsetY = random.nextDouble() * offsetYMax - (offsetYMax / 2);
 
-                // Generar la posición real de cada brick en el cluster
                 double brickX = centerX + offsetX;
                 double brickY = centerY + offsetY;
 
-                // Verificar si la nueva posición está disponible
                 if (isPositionAvailable(brickX, brickY, bricks, brickWidth, brickHeight)) {
-                    // Aplicar la decoración aleatoria
                     AbstractBrick brick = new StandardBrick(brickX, brickY, brickWidth, brickHeight);
-                    brick = applyRandomDecorator(brick, gameLoop); // Pasamos el gameLoop al decorador
+                    brick = applyRandomDecorator(brick, gameLoop, ballSpawner);
 
                     bricks.add(brick);
                     blocksGenerated++;
@@ -75,43 +69,34 @@ public class BrickSpawner {
                 retryCount++;
             }
 
-            // Si no se pudo colocar un bloque en los intentos permitidos, salimos del ciclo.
             if (retryCount == maxRetries) {
                 System.out.println("No se pudo colocar un bloque después de " + maxRetries + " intentos.");
             }
         }
 
-        // Imprimir la cantidad de bloques generados y fallidos
         System.out.println("Cluster " + (currentCluster + 1) + ": Generados: " + blocksGenerated + ", Fallidos: " + blocksFailed);
 
-        // Recursivamente generar el siguiente cluster
-        generateClusterRecursive(bricks, currentCluster + 1, maxClusters, gameLoop);
+        generateClusterRecursive(bricks, currentCluster + 1, maxClusters, gameLoop, ballSpawner);
     }
 
-    private AbstractBrick applyRandomDecorator(AbstractBrick brick, GameLoop gameLoop) {
-        // 50% de probabilidad de aplicar un decorador
+    private AbstractBrick applyRandomDecorator(AbstractBrick brick, GameLoop gameLoop, BallSpawner ballSpawner) {
         if (random.nextBoolean()) {
-            // Probabilidad de aplicar GlowingBrickDecorator
             if (random.nextBoolean()) {
                 return new GlowingBrickDecorator(brick);
-            }
-            // Probabilidad de aplicar MultiBallBrickDecorator
-            else {
-                return new MultiBallBrickDecorator(brick, gameLoop);  // Pasamos gameLoop
+            } else {
+                return new MultiBallBrickDecorator(brick, gameLoop, ballSpawner);
             }
         }
-        return brick;  // Si no, devolvemos el brick sin decorador.
+        return brick;
     }
 
-    // Verificar si una nueva posición está disponible (sin solapamientos)
     private boolean isPositionAvailable(double x, double y, List<AbstractBrick> existingBricks, double width, double height) {
         for (AbstractBrick brick : existingBricks) {
-            // Verifica si las coordenadas del nuevo bloque están dentro del área de un bloque existente
             if (x < brick.getX() + brick.getWidth() && x + width > brick.getX() &&
-                    y < brick.getY() + brick.getHeight() && y + height > brick.getY()) {
-                return false;  // Hay solapamiento
+                y < brick.getY() + brick.getHeight() && y + height > brick.getY()) {
+                return false;
             }
         }
-        return true;  // No hay solapamiento
+        return true;
     }
 }
