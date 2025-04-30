@@ -4,11 +4,10 @@ import com.breakout.config.ConfigLoader;
 import com.breakout.entities.ball.Ball;
 import com.breakout.entities.ball.BallSpawner;
 import com.breakout.entities.brick.AbstractBrick;
-import com.breakout.entities.brick.BrickSpawner;
 import com.breakout.entities.paddle.Paddle;
+import com.breakout.level.facade.LevelLoader;
 import com.breakout.manager.LifeManager;
 import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -28,7 +27,7 @@ public class GameLoop extends AnimationTimer {
     private final Paddle paddle;
     private List<AbstractBrick> bricks;
 
-    private final BallSpawner ballSpawner; // ✅ NUEVO
+    private final BallSpawner ballSpawner;
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -46,16 +45,19 @@ public class GameLoop extends AnimationTimer {
                 GameApp.HEIGHT - ConfigLoader.getInstance().getInt("paddle.height")
         );
 
-        this.ballSpawner = new BallSpawner(); // ✅
+        this.ballSpawner = new BallSpawner();
+
+        double radius = ConfigLoader.getInstance().getDouble("ball.radius");
 
         Ball initialBall = ballSpawner.spawnBall(
-                GameApp.WIDTH / 2.0,
-                paddle.getY() - ConfigLoader.getInstance().getInt("ball.radius")
+                paddle.getX() + paddle.getWidth() / 2.0 - radius,  // Centrada horizontalmente
+                paddle.getY() - 1.5 * radius                       // Un poco separada del paddle
         );
+        initialBall.setDy(Math.abs(initialBall.getDy()));      // Asegura que caiga hacia abajo
         balls.add(initialBall);
 
-        this.bricks = new BrickSpawner().generateBricks(this, ballSpawner);
 
+        this.bricks = LevelLoader.loadLevel("levels/level1.json", this, ballSpawner);
     }
 
     @Override
@@ -259,7 +261,7 @@ public class GameLoop extends AnimationTimer {
 
     public void resetGame() {
         balls.clear();
-        bricks = new BrickSpawner().generateBricks(this, ballSpawner);
+        bricks = LevelLoader.loadLevel("levels/level1.json", this, ballSpawner);
 
         totalScore = 0;
         LifeManager.getInstance().reset();
@@ -284,6 +286,6 @@ public class GameLoop extends AnimationTimer {
     }
 
     public BallSpawner getBallSpawner() {
-        return ballSpawner; // ✅ para decoradores y otras clases
+        return ballSpawner;
     }
 }

@@ -69,7 +69,6 @@ public class Ball {
         this.active = active;
 
         if (!active) {
-            // Efecto visual al desaparecer
             this.dx = 0;
             this.dy = 0;
         }
