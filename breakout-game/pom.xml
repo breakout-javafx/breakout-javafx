@@ -34,6 +34,15 @@
         </plugins>
     </build>
 
+    <dependencies>
+        <!-- Dependencia para Jackson (Mapper para trabajar con JSON) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>linux</id>

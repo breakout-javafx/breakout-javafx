@@ -1,0 +1,165 @@
+[
+  {
+    "level": 1,
+    "totalBlocks": 20,
+    "types": {
+      "standard": 15,
+      "glowing": 5
+    },
+    "offsets": {
+      "xMax": 80,
+      "yMax": 50
+    },
+    "blocks": [
+      {"x": 100, "y": 150, "type": "standard"},
+      {"x": 200, "y": 150, "type": "standard"},
+      {"x": 300, "y": 150, "type": "standard"},
+      {"x": 400, "y": 150, "type": "standard"},
+      {"x": 500, "y": 150, "type": "standard"},
+      {"x": 600, "y": 150, "type": "standard"},
+      {"x": 100, "y": 200, "type": "glowing"},
+      {"x": 200, "y": 200, "type": "glowing"},
+      {"x": 300, "y": 200, "type": "glowing"},
+      {"x": 400, "y": 200, "type": "glowing"},
+      {"x": 500, "y": 200, "type": "glowing"},
+      {"x": 600, "y": 200, "type": "glowing"},
+      {"x": 50, "y": 250, "type": "standard"},
+      {"x": 150, "y": 250, "type": "standard"},
+      {"x": 250, "y": 250, "type": "standard"},
+      {"x": 350, "y": 250, "type": "standard"},
+      {"x": 450, "y": 250, "type": "standard"},
+      {"x": 550, "y": 250, "type": "standard"},
+      {"x": 100, "y": 300, "type": "glowing"}
+    ]
+  },
+  {
+    "level": 2,
+    "totalBlocks": 25,
+    "types": {
+      "standard": 10,
+      "glowing": 10,
+      "multiBall": 5
+    },
+    "offsets": {
+      "xMax": 90,
+      "yMax": 60
+    },
+    "blocks": [
+      {"x": 100, "y": 100, "type": "glowing"},
+      {"x": 200, "y": 100, "type": "glowing"},
+      {"x": 300, "y": 100, "type": "glowing"},
+      {"x": 400, "y": 100, "type": "glowing"},
+      {"x": 500, "y": 100, "type": "glowing"},
+      {"x": 600, "y": 100, "type": "glowing"},
+      {"x": 100, "y": 150, "type": "multiBall"},
+      {"x": 200, "y": 150, "type": "multiBall"},
+      {"x": 300, "y": 150, "type": "multiBall"},
+      {"x": 400, "y": 150, "type": "multiBall"},
+      {"x": 500, "y": 150, "type": "multiBall"},
+      {"x": 600, "y": 150, "type": "multiBall"},
+      {"x": 100, "y": 200, "type": "standard"},
+      {"x": 200, "y": 200, "type": "standard"},
+      {"x": 300, "y": 200, "type": "standard"},
+      {"x": 400, "y": 200, "type": "standard"},
+      {"x": 500, "y": 200, "type": "standard"},
+      {"x": 600, "y": 200, "type": "standard"},
+      {"x": 100, "y": 250, "type": "standard"},
+      {"x": 200, "y": 250, "type": "standard"},
+      {"x": 300, "y": 250, "type": "standard"},
+      {"x": 400, "y": 250, "type": "standard"},
+      {"x": 500, "y": 250, "type": "standard"},
+      {"x": 600, "y": 250, "type": "standard"}
+    ]
+  },
+  {
+    "level": 3,
+    "totalBlocks": 30,
+    "types": {
+      "standard": 12,
+      "multiBall": 10,
+      "glowing": 8
+    },
+    "offsets": {
+      "xMax": 100,
+      "yMax": 70
+    },
+    "blocks": [
+      {"x": 100, "y": 50, "type": "multiBall"},
+      {"x": 200, "y": 50, "type": "multiBall"},
+      {"x": 300, "y": 50, "type": "multiBall"},
+      {"x": 400, "y": 50, "type": "multiBall"},
+      {"x": 500, "y": 50, "type": "multiBall"},
+      {"x": 600, "y": 50, "type": "multiBall"},
+      {"x": 100, "y": 100, "type": "multiBall"},
+      {"x": 200, "y": 100, "type": "multiBall"},
+      {"x": 300, "y": 100, "type": "multiBall"},
+      {"x": 400, "y": 100, "type": "multiBall"},
+      {"x": 500, "y": 100, "type": "multiBall"},
+      {"x": 600, "y": 100, "type": "multiBall"},
+      {"x": 100, "y": 150, "type": "glowing"},
+      {"x": 200, "y": 150, "type": "glowing"},
+      {"x": 300, "y": 150, "type": "glowing"},
+      {"x": 400, "y": 150, "type": "glowing"},
+      {"x": 500, "y": 150, "type": "glowing"},
+      {"x": 600, "y": 150, "type": "glowing"},
+      {"x": 50, "y": 200, "type": "standard"},
+      {"x": 150, "y": 200, "type": "standard"},
+      {"x": 250, "y": 200, "type": "standard"},
+      {"x": 350, "y": 200, "type": "standard"},
+      {"x": 450, "y": 200, "type": "standard"},
+      {"x": 550, "y": 200, "type": "standard"},
+      {"x": 100, "y": 250, "type": "standard"},
+      {"x": 200, "y": 250, "type": "standard"},
+      {"x": 300, "y": 250, "type": "standard"},
+      {"x": 400, "y": 250, "type": "standard"},
+      {"x": 500, "y": 250, "type": "standard"},
+      {"x": 600, "y": 250, "type": "standard"}
+    ]
+  },
+  {
+    "level": 4,
+    "totalBlocks": 40,
+    "types": {
+      "standard": 20,
+      "glowing": 10,
+      "multiBall": 10
+    },
+    "offsets": {
+      "xMax": 70,
+      "yMax": 40
+    },
+    "blocks": [
+      {"x": 100, "y": 50, "type": "standard"},
+      {"x": 200, "y": 50, "type": "standard"},
+      {"x": 300, "y": 50, "type": "standard"},
+      {"x": 400, "y": 50, "type": "standard"},
+      {"x": 500, "y": 50, "type": "standard"},
+      {"x": 600, "y": 50, "type": "standard"},
+      {"x": 100, "y": 100, "type": "standard"},
+      {"x": 200, "y": 100, "type": "standard"},
+      {"x": 300, "y": 100, "type": "standard"},
+      {"x": 400, "y": 100, "type": "standard"},
+      {"x": 500, "y": 100, "type": "standard"},
+      {"x": 600, "y": 100, "type": "standard"},
+      {"x": 100, "y": 150, "type": "glowing"},
+      {"x": 200, "y": 150, "type": "glowing"},
+      {"x": 300, "y": 150, "type": "glowing"},
+      {"x": 400, "y": 150, "type": "glowing"},
+      {"x": 500, "y": 150, "type": "glowing"},
+      {"x": 600, "y": 150, "type": "glowing"},
+      {"x": 100, "y": 200, "type": "multiBall"},
+      {"x": 200, "y": 200, "type": "multiBall"},
+      {"x": 300, "y": 200, "type": "multiBall"},
+      {"x": 400, "y": 200, "type": "multiBall"},
+      {"x": 500, "y": 200, "type": "multiBall"},
+      {"x": 600, "y": 200, "type": "multiBall"},
+      {"x": 100, "y": 250, "type": "multiBall"},
+      {"x": 200, "y": 250, "type": "multiBall"},
+      {"x": 300, "y": 250, "type": "multiBall"},
+      {"x": 400, "y": 250, "type": "multiBall"},
+      {"x": 500, "y": 250, "type": "multiBall"},
+      {"x": 600, "y": 250, "type": "multiBall"},
+      {"x": 100, "y": 300, "type": "glowing"}
+    ]
+  }
+]
