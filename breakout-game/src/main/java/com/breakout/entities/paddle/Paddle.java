@@ -41,4 +41,9 @@ public class Paddle {
     public double getY() { return y; }
     public double getWidth() { return width; }
     public double getHeight() { return height; }
+
+    public void resetPosition() {
+        this.x = GameApp.WIDTH / 2.0 - this.width / 2.0;
+        this.y = GameApp.HEIGHT - ConfigLoader.getInstance().getInt("paddle.height");
+    }
 }

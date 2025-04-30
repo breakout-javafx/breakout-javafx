@@ -81,10 +81,21 @@ public class GameApp extends Application {
     }
 
     private void configureInput(Scene scene, GameLoop loop) {
+        scene.getRoot().setFocusTraversable(true);
+        scene.getRoot().requestFocus();
+
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.LEFT) loop.setLeftPressed(true);
             if (e.getCode() == KeyCode.RIGHT) loop.setRightPressed(true);
-            if (e.getCode() == KeyCode.SPACE) loop.startGame(); // Inicia la partida
+            if (e.getCode() == KeyCode.SPACE) {
+                if (loop.isGameOver()) {
+                    // Reinicio
+                    loop.resetGame();
+                    loop.startGame();
+                } else {
+                    loop.startGame();
+                }
+            }
         });
 
         scene.setOnKeyReleased(e -> {

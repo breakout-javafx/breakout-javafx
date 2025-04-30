@@ -11,6 +11,7 @@ public class Ball {
     private double x, y;
     private double dx, dy;
     private final double radius = 10;
+    private boolean active = true;
 
     private BallMovementStrategy movementStrategy;  // Agregamos el strategy
 
@@ -58,5 +59,20 @@ public class Ball {
     // Método para obtener los límites de la pelota, útil para la detección de colisiones
     public Rectangle2D getBounds() {
         return new Rectangle2D(x - radius, y - radius, 2 * radius, 2 * radius);
+    }
+
+    // Nuevos Métodos
+    public boolean isActive () {
+        return active;
+    }
+
+    public void setActive (boolean active) {
+        this.active = active;
+
+        if (!active) {
+            // Efecto visual al desaparecer
+            this.dx = 0;
+            this.dy = 0;
+        }
     }
 }
