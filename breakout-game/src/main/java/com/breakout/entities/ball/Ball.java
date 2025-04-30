@@ -22,7 +22,6 @@ public class Ball {
         this.dx = ConfigLoader.getInstance().getDouble("ball.speed");
         this.dy = this.dx;  // Usar la misma velocidad para el eje Y
 
-        this.movementStrategy = new NormalMovementStrategy();  // Valor por defecto
     }
 
     public void update() {
