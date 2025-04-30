@@ -1,6 +1,6 @@
-package com.breakout.entites.brick.decorator;
+package com.breakout.entities.brick.decorator;
 
-import com.breakout.entites.brick.AbstractBrick;
+import com.breakout.entities.brick.AbstractBrick;
 import javafx.scene.canvas.GraphicsContext;
 
 public abstract class BrickDecorator extends AbstractBrick {
@@ -12,9 +12,28 @@ public abstract class BrickDecorator extends AbstractBrick {
         this.decoratedBrick = decoratedBrick;
     }
 
-
     @Override
     public void render(GraphicsContext gc) {
         decoratedBrick.render(gc);
+    }
+
+    @Override
+    public void hit() {
+        decoratedBrick.hit();
+    }
+
+    @Override
+    public boolean isDestroyed() {
+        return decoratedBrick.isDestroyed();
+    }
+
+    @Override
+    protected void initializeShape() {
+        // No cambia la forma
+    }
+
+    @Override
+    protected void initializeColor() {
+        // No cambia el color
     }
 }

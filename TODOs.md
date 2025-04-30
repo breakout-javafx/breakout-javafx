@@ -13,22 +13,29 @@
 
 - [x] **Control de FPS**  
   *Añadir control para la tasa de frames por segundo para asegurar que el juego corra de manera fluida en todas las plataformas.*  
-  **Done by:** _[javi]_
+  **Done by:** _[Javi]_
 
+- [x] **Mapa, Paredes y Colisiones**  
+  *Añadir un sistema de detección de paredes, para contemplar top/right/left/bottom y que sea lo suficientemente abstracto como para permitir en un futuro controlar las vidas*  
+  **Done by:** _[Álvaro]_
+
+- [x] **Control vidas**  
+  *Añadir algún item reutilizable que permita controlar cuántas vidas quedan y asegurar una interconexión con las clases wall*  
+  **Done by:** _[Álvaro]_
 
 - [x] **Lógica de rebotes de la pelota**  
   *Asegurar la lógica básica de rebote.*  
-  **Done by:** _[javi]_
+  **Done by:** _[javi & alvaro]_
 
 
 - [x] **Ajustar tamaño de la ventana del juego**  
   *La ventana se inicializa en pantalla completa. El panel de juego es más pequeño que la pantalla.*  
-  **Done by:** _[javi]_
+  **Done by:** _[Javi]_
 
 
 - [x] **Añadir delimitadores del panel de juego (bordes)**  
   *Dibujar los bordel del panel de juego para que se vean de forma clara los límites*  
-  **Done by:** _[Javi]_
+  **Done by:** _[Javi & Álvaro]_
 
 
 - [x] **Cambiar pos inical de paddle**  
@@ -38,22 +45,36 @@
 
 - [x] **Creación de bricks**  
   *Crear el objeto brick implementado patrones de uso*  
-  **Done by:** _[Nombre del responsable]_
+  **Done by:** _[Javi]_
 
 
 - [x] **Algoritmo spawn brick**  
   *Diseñar el algoritmo de spawn de los mismos*  
-  **Done by:** _[javi]_
+  **Done by:** _[Javi]_  
 
+- [x] **Patron Strategy**  
+  *Implementación patrón strategy a Ball*  
+  **Done by:** _[Javi]_  
 
-- [ ] **Ajuste tamaño ventan juego**
+- [x] **Posición Ball al empezar**  
+  *La pelota se mueve a donde este el Paddle. Solo al pulsar espacio la partida comienza*  
+  **Done by:** _[Javi]_  
+
+- [x] **Decorator para pelotas y spawn de muchas bolas**  
+  *Añadir la lógica de generación de múltiples pelotas y la integración con el patrón Decorator para modificar su comportamiento.*  
+  **Done by:** _[Javi]_  
+
+- [ ] **Gestionar la lógica de eliminación y finalización de la partida**  
+  *Encargarse de que se use el setting de radio de bola al generar la bola. Implementar la lógica de eliminación de bolas al tocar la base de la pantalla y finalizar la partida si nos quedamos sin bolas.*
+  **Done by:** _[Nombre del responsable]_  
+
+- [ ] **Ajuste tamaño ventan juego**  
   *Implementar el ajuste del tamaño de la ventana de juego (no ventana total) desde el .properties.*  
-  **Done by:** _[Nombre del responsable]_
-
+  **Done by:** _[Nombre del responsable]_  
 
 - [ ] **Score tracker**  
   *Investigar, crear e implentar la tabla de puntuación y su lógica*  
-  **Done by:** _[Nombre del responsable]_
+  **Done by:** _[Nombre del responsable]_  
 
 ---
 
@@ -67,7 +88,11 @@
   **Done by:** _[Nombre del responsable]_
 
 - [ ] **Añadir decoratos Brick**  
-  *UDiseñar e implementar mas decoradores para brick. Añadirlos al algoritmo de generación. SI hay duda hablar ocn Javi.*  
+  *Diseñar e implementar mas decoradores para brick. Añadirlos al algoritmo de generación. SI hay duda hablar ocn Javi.*  
+  **Done by:** _[Nombre del responsable]_
+
+- [ ] **Añadir strategies Ball**  
+  *Diseñar e implementar estrategis de comportamiento para Ball. Implementarla con destrucción de bloques*    
   **Done by:** _[Nombre del responsable]_
 
 ---
@@ -91,6 +116,6 @@
 | **Singleton** | ConfigLoader                     |
 | **Decorator** | AbstractBrick                    |
 | **Template**  | AbstractBrick                    |
-| **Patrón 4**  | Descripción de dónde se ha usado |
+| **Strategy**  | Ball / NormalMovementStrategy    |
 | **Patrón 5**  | Descripción de dónde se ha usado |
 | **Patrón 6**  | Descripción de dónde se ha usado |

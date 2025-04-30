@@ -30,8 +30,8 @@ public class ConfigLoader {
         return instance;
     }
 
-    public int getInt(String key) {
-        return Integer.parseInt(properties.getProperty(key));
+    public int getInt(String keyString) {
+        return Integer.parseInt(properties.getProperty(keyString));
     }
 
     public double getDouble(String key) {

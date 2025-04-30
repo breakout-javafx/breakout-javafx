@@ -16,6 +16,11 @@ public class GameApp extends Application {
     public static int HEIGHT;
     private static final String TITLE = ConfigLoader.getInstance().get("game.tittle");
 
+
+    //TODO ENCARGARSE DE QUE SE USE EL SEETING DE REDIO DE BOLA AL GENERAR LA BOLA
+    //LÓGICA DE ELIMINAR BOLAS AL TOCAR LA BASE DE LA PANTALLA
+    //LÓGICA DE TERMINAR PARTIDA SI NOS QUEDAMOS SIN BOLAS
+
     @Override
     public void start(Stage primaryStage) {
         // Configuración base
@@ -45,7 +50,8 @@ public class GameApp extends Application {
         primaryStage.setTitle(TITLE);
         primaryStage.setFullScreen(true);  // Pantalla completa
         primaryStage.setFullScreenExitHint(""); // Opcional
-        primaryStage.centerOnScreen(); // Centra automáticamente
+        primaryStage.centerOnScreen();
+        primaryStage.toFront();
 
     }
 
@@ -75,9 +81,21 @@ public class GameApp extends Application {
     }
 
     private void configureInput(Scene scene, GameLoop loop) {
+        scene.getRoot().setFocusTraversable(true);
+        scene.getRoot().requestFocus();
+
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.LEFT) loop.setLeftPressed(true);
             if (e.getCode() == KeyCode.RIGHT) loop.setRightPressed(true);
+            if (e.getCode() == KeyCode.SPACE) {
+                if (loop.isGameOver()) {
+                    // Reinicio
+                    loop.resetGame();
+                    loop.startGame();
+                } else {
+                    loop.startGame();
+                }
+            }
         });
 
         scene.setOnKeyReleased(e -> {

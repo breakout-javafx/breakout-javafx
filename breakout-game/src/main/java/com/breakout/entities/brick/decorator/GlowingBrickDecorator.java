@@ -1,6 +1,6 @@
-package com.breakout.entites.brick.decorator;
+package com.breakout.entities.brick.decorator;
 
-import com.breakout.entites.brick.AbstractBrick;
+import com.breakout.entities.brick.AbstractBrick;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -8,6 +8,7 @@ public class GlowingBrickDecorator extends BrickDecorator {
 
     public GlowingBrickDecorator(AbstractBrick decoratedBrick) {
         super(decoratedBrick);
+        this.score = decoratedBrick.getScore() + 20; // GlowingBrick suma +20 puntos
     }
 
     @Override
@@ -20,14 +21,7 @@ public class GlowingBrickDecorator extends BrickDecorator {
     }
 
     @Override
-    protected void initializeShape() {
-        // Nada: ya lo hace el ladrillo decorado
-    }
-
+    protected void initializeShape() {}
     @Override
-    protected void initializeColor() {
-        // Nada: ya lo hace el ladrillo decorado
-    }
-
-
+    protected void initializeColor() {}
 }
