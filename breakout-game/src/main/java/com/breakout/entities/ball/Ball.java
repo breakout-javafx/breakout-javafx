@@ -2,30 +2,34 @@ package com.breakout.entities.ball;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.entities.ball.strategy.BallMovementStrategy;
-import com.breakout.entities.ball.strategy.NormalMovementStrategy;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Ball {
     private double x, y;
+    private double prevX, prevY; // ✅ Añadido: posición anterior
+
     private double dx, dy;
     private final double radius = 10;
     private boolean active = true;
 
-    private BallMovementStrategy movementStrategy;  // Agregamos el strategy
+    private BallMovementStrategy movementStrategy;
 
     public Ball(double startX, double startY) {
         this.x = startX;
         this.y = startY;
 
         this.dx = ConfigLoader.getInstance().getDouble("ball.speed");
-        this.dy = this.dx;  // Usar la misma velocidad para el eje Y
-
+        this.dy = this.dx;
     }
 
     public void update() {
-        movementStrategy.move(this);  // Delegar el movimiento al strategy
+        // ✅ Guardamos la posición antes de mover
+        prevX = x;
+        prevY = y;
+
+        movementStrategy.move(this);
     }
 
     public void render(GraphicsContext gc) {
@@ -55,12 +59,10 @@ public class Ball {
         this.movementStrategy = strategy;
     }
 
-    // Método para obtener los límites de la pelota, útil para la detección de colisiones
     public Rectangle2D getBounds() {
         return new Rectangle2D(x - radius, y - radius, 2 * radius, 2 * radius);
     }
 
-    // Nuevos Métodos
     public boolean isActive () {
         return active;
     }
@@ -73,4 +75,8 @@ public class Ball {
             this.dy = 0;
         }
     }
+
+    // ✅ Nuevos getters para colisión basada en movimiento
+    public double getPrevX() { return prevX; }
+    public double getPrevY() { return prevY; }
 }
