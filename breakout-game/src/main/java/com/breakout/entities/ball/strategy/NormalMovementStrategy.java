@@ -2,6 +2,7 @@ package com.breakout.entities.ball.strategy;
 
 import com.breakout.core.GameApp;
 import com.breakout.entities.ball.Ball;
+import com.breakout.entities.paddle.Paddle;
 import com.breakout.entities.wall.CollisionStrategy;
 
 import java.util.Map;
@@ -9,9 +10,13 @@ import java.util.Map;
 public class NormalMovementStrategy implements BallMovementStrategy {
 
     private final Map<String, CollisionStrategy> walls;
+    private final Paddle paddle;
+    private final PaddleCollisionStrategy paddleCollision;
 
-    public NormalMovementStrategy(Map<String, CollisionStrategy> walls) {
+    public NormalMovementStrategy(Map<String, CollisionStrategy> walls, Paddle paddle) {
         this.walls = walls;
+        this.paddle = paddle;
+        this.paddleCollision = new PaddleCollisionStrategy();
     }
 
     @Override
@@ -31,6 +36,11 @@ public class NormalMovementStrategy implements BallMovementStrategy {
             walls.get("top").onCollision(ball);
         } else if (ball.getY() >= GameApp.HEIGHT - ball.getRadius()) {
             walls.get("bottom").onCollision(ball);
+        }
+
+        // Colisión con el paddle usando ángulo de rebote
+        if (ball.getBounds().intersects(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight())) {
+            paddleCollision.onCollision(ball, paddle);
         }
     }
 }
