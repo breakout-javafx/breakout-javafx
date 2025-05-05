@@ -13,7 +13,8 @@ public class GlowingBrickDecorator extends BrickDecorator {
     private static final Image TEXTURE;
 
     static {
-        TEXTURE = new Image(Objects.requireNonNull(GlowingBrickDecorator.class.getResourceAsStream("/textures/glowing_brick.png")));
+        TEXTURE = new Image(Objects.requireNonNull(GlowingBrickDecorator
+                .class.getResourceAsStream(ConfigLoader.getInstance().get("ball.decorator.glowing.texture"))));
         if (TEXTURE.isError()) {
             System.err.println("No se pudo cargar la textura de GlowingBrickDecorator.");
         }

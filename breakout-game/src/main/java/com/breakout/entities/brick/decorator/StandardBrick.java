@@ -15,7 +15,8 @@ public class StandardBrick extends AbstractBrick {
 
     static {
         // Carga la imagen desde dentro del JAR (resources)
-        TEXTURE = new Image(Objects.requireNonNull(StandardBrick.class.getResourceAsStream("/textures/standard_brick.png")));
+        TEXTURE = new Image(Objects.requireNonNull(StandardBrick.class
+                .getResourceAsStream(ConfigLoader.getInstance().get("ball.decorator.standard.texture"))));
         if (TEXTURE.isError()) {
             System.err.println("No se pudo cargar la textura de StandardBrick.");
         }

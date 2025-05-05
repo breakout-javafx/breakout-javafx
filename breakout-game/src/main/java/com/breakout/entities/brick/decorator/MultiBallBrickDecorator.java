@@ -19,7 +19,8 @@ public class MultiBallBrickDecorator extends BrickDecorator {
     private static final Image TEXTURE;
 
     static {
-        TEXTURE = new Image(Objects.requireNonNull(MultiBallBrickDecorator.class.getResourceAsStream("/textures/multiball_brick.png")));
+        TEXTURE = new Image(Objects.requireNonNull(MultiBallBrickDecorator.class.
+                getResourceAsStream(ConfigLoader.getInstance().get("ball.decorator.multiball.texture"))));
         if (TEXTURE.isError()) {
             System.err.println("No se pudo cargar la textura de MultiBallBrickDecorator.");
         }
