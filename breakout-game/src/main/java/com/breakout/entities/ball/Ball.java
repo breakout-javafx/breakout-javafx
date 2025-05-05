@@ -2,9 +2,13 @@ package com.breakout.entities.ball;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.entities.ball.strategy.BallMovementStrategy;
+import com.breakout.entities.brick.decorator.StandardBrick;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+
+import java.util.Objects;
 
 public class Ball {
     private double x, y;
@@ -13,6 +17,20 @@ public class Ball {
     private double dx, dy;
     private final double radius = 10;
     private boolean active = true;
+
+    private static final Image TEXTURE;
+
+
+    static {
+        TEXTURE = new Image(
+                Objects.requireNonNull(StandardBrick.class.getResourceAsStream(
+                        ConfigLoader.getInstance().get("ball.texture"))),
+                0, 0, false, false
+        );
+        if (TEXTURE.isError()) {
+            System.err.println("No se pudo cargar la textura de la bola.");
+        }
+    }
 
     private BallMovementStrategy movementStrategy;
 
@@ -33,9 +51,14 @@ public class Ball {
     }
 
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.RED);
-        gc.fillOval(x, y, radius, radius);
+        if (TEXTURE != null && !TEXTURE.isError()) {
+            gc.drawImage(TEXTURE, x, y, radius, radius);
+        } else {
+            gc.setFill(Color.RED);
+            gc.fillOval(x, y, radius, radius);
+        }
     }
+
 
     public double getX() { return x; }
     public void setX(double x) { this.x = x; }

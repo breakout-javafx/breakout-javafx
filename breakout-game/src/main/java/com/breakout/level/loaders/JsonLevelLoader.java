@@ -61,7 +61,6 @@ public class JsonLevelLoader {
             case 9 -> new MultiBallBrickDecorator(
                     new StandardBrick(x, y, TILE_WIDTH, TILE_HEIGHT), gameLoop, spawner
             );
-            // Puedes añadir más casos si agregas más tipos de ladrillo en tu tileset
             default -> null;
         };
     }
