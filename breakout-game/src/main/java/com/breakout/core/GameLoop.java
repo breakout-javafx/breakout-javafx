@@ -45,17 +45,16 @@ public class GameLoop extends AnimationTimer {
                 GameApp.HEIGHT - ConfigLoader.getInstance().getInt("paddle.height")
         );
 
-        this.ballSpawner = new BallSpawner();
+        this.ballSpawner = new BallSpawner(paddle); // ✅ Se pasa el paddle al spawner
 
         double radius = ConfigLoader.getInstance().getDouble("ball.radius");
 
         Ball initialBall = ballSpawner.spawnBall(
-                paddle.getX() + paddle.getWidth() / 2.0 - radius,  // Centrada horizontalmente
-                paddle.getY() - 1.5 * radius                       // Un poco separada del paddle
+                paddle.getX() + paddle.getWidth() / 2.0 - radius,
+                paddle.getY() - 1.5 * radius
         );
-        initialBall.setDy(Math.abs(initialBall.getDy()));      // Asegura que caiga hacia abajo
+        initialBall.setDy(Math.abs(initialBall.getDy())); // ✅ Asegura que la bola baje inicialmente
         balls.add(initialBall);
-
 
         this.bricks = LevelLoader.loadLevel("levels/level1.json", this, ballSpawner);
     }
@@ -102,25 +101,23 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void handleCollisions() {
-        for (Ball ball : balls) {
-            if (ball.getY() + ball.getRadius() >= paddle.getY() &&
-                    ball.getX() + ball.getRadius() >= paddle.getX() &&
-                    ball.getX() - ball.getRadius() <= paddle.getX() + paddle.getWidth()) {
-                ball.invertY();
-            }
-        }
+        // 🧹 Eliminada colisión directa con el paddle: ahora se maneja dentro de la estrategia
 
         Iterator<AbstractBrick> iterator = bricks.iterator();
         while (iterator.hasNext()) {
             AbstractBrick brick = iterator.next();
+
             for (Ball ball : balls) {
                 if (ball.getBounds().intersects(brick.getBounds())) {
                     brick.hit();
+                    ball.invertY();
+
                     if (brick.isDestroyed()) {
                         addScore(brick.getScore());
                         iterator.remove();
                     }
-                    ball.invertY();
+
+                    break;
                 }
             }
         }
