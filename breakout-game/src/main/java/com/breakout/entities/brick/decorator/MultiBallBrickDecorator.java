@@ -7,6 +7,7 @@ import com.breakout.entities.ball.BallSpawner;
 import com.breakout.entities.brick.AbstractBrick;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 import java.util.Objects;
 import java.util.Random;
@@ -69,7 +70,15 @@ public class MultiBallBrickDecorator extends BrickDecorator {
 
         double opacity = Math.max(0.2, (double) health / maxHealth);
         gc.setGlobalAlpha(opacity);
-        gc.drawImage(TEXTURE, x, y, width, height);
+
+        if (TEXTURE != null && !TEXTURE.isError()) {
+            gc.drawImage(TEXTURE, x, y, width, height);
+        } else {
+            gc.setFill(Color.GRAY); // Color de respaldo si falla la textura
+            gc.fillRect(x, y, width, height);
+        }
+
         gc.setGlobalAlpha(1.0);
     }
+
 }

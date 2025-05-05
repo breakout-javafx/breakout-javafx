@@ -4,6 +4,7 @@ import com.breakout.config.ConfigLoader;
 import com.breakout.entities.brick.AbstractBrick;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 import java.util.Objects;
 
@@ -34,13 +35,21 @@ public class GlowingBrickDecorator extends BrickDecorator {
 
     @Override
     public void render(GraphicsContext gc) {
-        super.render(gc); // Render base brick
+        super.render(gc);
 
         double opacity = Math.max(0.2, (double) health / maxHealth);
         gc.setGlobalAlpha(opacity);
-        gc.drawImage(TEXTURE, x, y, width, height);
+
+        if (TEXTURE != null && !TEXTURE.isError()) {
+            gc.drawImage(TEXTURE, x, y, width, height);
+        } else {
+            gc.setFill(Color.GRAY); // Color de respaldo si falla la textura
+            gc.fillRect(x, y, width, height);
+        }
+
         gc.setGlobalAlpha(1.0);
     }
+
 
     @Override
     protected void initializeShape() {}
