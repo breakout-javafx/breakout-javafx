@@ -1,6 +1,7 @@
 package com.breakout.core;
 
 import com.breakout.config.ConfigLoader;
+import com.breakout.ui.LevelMenu;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -12,47 +13,36 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class GameApp extends Application {
+
     public static int WIDTH;
     public static int HEIGHT;
     private static final String TITLE = ConfigLoader.getInstance().get("game.tittle");
 
-
-    //TODO ENCARGARSE DE QUE SE USE EL SEETING DE REDIO DE BOLA AL GENERAR LA BOLA
-    //LÓGICA DE ELIMINAR BOLAS AL TOCAR LA BASE DE LA PANTALLA
-    //LÓGICA DE TERMINAR PARTIDA SI NOS QUEDAMOS SIN BOLAS
+    private static Stage primaryStage;
+    private static GameLoop currentLoop;
 
     @Override
-    public void start(Stage primaryStage) {
-        // Configuración base
+    public void start(Stage stage) {
+        primaryStage = stage;
+
+        // Escalar y configurar ventana
         initializeWindow(primaryStage);
 
-        // Crear y mostrar el canvas y escena
-        Canvas canvas = createCanvas(primaryStage);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        // Crear el GameLoop
-        GameLoop loop = new GameLoop(gc);
-        loop.start();
-
-        // Configurar los eventos de entrada
-        configureInput(primaryStage.getScene(), loop);
+        // Mostrar menú de selección de nivel
+        new LevelMenu(primaryStage).show();
     }
 
-    private void initializeWindow(Stage primaryStage) {
-        // Obtener las dimensiones de la pantalla
+    private void initializeWindow(Stage stage) {
         int baseWidth = ConfigLoader.getInstance().getInt("window.width");
         int baseHeight = ConfigLoader.getInstance().getInt("window.height");
 
-        // Escalar la ventana
         scaleWindow(baseWidth, baseHeight);
 
-        // Configuración de la ventana
-        primaryStage.setTitle(TITLE);
-        primaryStage.setFullScreen(true);  // Pantalla completa
-        primaryStage.setFullScreenExitHint(""); // Opcional
-        primaryStage.centerOnScreen();
-        primaryStage.toFront();
-
+        stage.setTitle(TITLE);
+        stage.setFullScreen(true);
+        stage.setFullScreenExitHint("");
+        stage.centerOnScreen();
+        stage.toFront();
     }
 
     private void scaleWindow(int baseWidth, int baseHeight) {
@@ -65,42 +55,47 @@ public class GameApp extends Application {
         HEIGHT = (int) (baseHeight * scale);
     }
 
-    private Canvas createCanvas(Stage primaryStage) {
+    /**
+     * Método llamado desde LevelMenu al seleccionar un nivel.
+     */
+    public static void startGame(String levelPath) {
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        currentLoop = new GameLoop(gc, levelPath);
 
         StackPane root = new StackPane(canvas);
         root.setPrefSize(WIDTH, HEIGHT);
         Scene scene = new Scene(root);
-
-        // Mostrar la ventana
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        return canvas;
+        configureInput(scene);
+
+        currentLoop.start();
     }
 
-    private void configureInput(Scene scene, GameLoop loop) {
+    private static void configureInput(Scene scene) {
         scene.getRoot().setFocusTraversable(true);
         scene.getRoot().requestFocus();
 
         scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.LEFT) loop.setLeftPressed(true);
-            if (e.getCode() == KeyCode.RIGHT) loop.setRightPressed(true);
+            if (e.getCode() == KeyCode.LEFT) currentLoop.setLeftPressed(true);
+            if (e.getCode() == KeyCode.RIGHT) currentLoop.setRightPressed(true);
+
             if (e.getCode() == KeyCode.SPACE) {
-                if (loop.isGameOver()) {
-                    // Reinicio
-                    loop.resetGame();
-                    loop.startGame();
+                if (currentLoop.isGameOver()) {
+                    // Volver al menú
+                    new LevelMenu(primaryStage).show();
                 } else {
-                    loop.startGame();
+                    currentLoop.startGame();
                 }
             }
         });
 
         scene.setOnKeyReleased(e -> {
-            if (e.getCode() == KeyCode.LEFT) loop.setLeftPressed(false);
-            if (e.getCode() == KeyCode.RIGHT) loop.setRightPressed(false);
+            if (e.getCode() == KeyCode.LEFT) currentLoop.setLeftPressed(false);
+            if (e.getCode() == KeyCode.RIGHT) currentLoop.setRightPressed(false);
         });
     }
 }

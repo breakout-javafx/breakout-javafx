@@ -21,7 +21,7 @@ public class GameLoop extends AnimationTimer {
 
     private static final double TARGET_FPS = Math.max(ConfigLoader.getInstance().getInt("game.fps"), 30);
     private static final double NANOS_PER_UPDATE = 1_000_000_000.0 / TARGET_FPS;
-    
+
     private final List<AbstractBrick> bricksRecentlyHit = new ArrayList<>();
 
     private final GraphicsContext gc;
@@ -30,6 +30,7 @@ public class GameLoop extends AnimationTimer {
     private List<AbstractBrick> bricks;
 
     private final BallSpawner ballSpawner;
+    private final String levelPath;
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -39,15 +40,16 @@ public class GameLoop extends AnimationTimer {
     private long lastUpdateTime = 0;
     private int totalScore = 0;
 
-    public GameLoop(GraphicsContext gc) {
+    public GameLoop(GraphicsContext gc, String levelPath) {
         this.gc = gc;
+        this.levelPath = levelPath;
 
         this.paddle = new Paddle(
                 GameApp.WIDTH / 2.0 - (ConfigLoader.getInstance().getInt("paddle.width") / 2.0),
                 GameApp.HEIGHT - ConfigLoader.getInstance().getInt("paddle.height")
         );
 
-        this.ballSpawner = new BallSpawner(paddle); // ✅ Se pasa el paddle al spawner
+        this.ballSpawner = new BallSpawner(paddle);
 
         double radius = ConfigLoader.getInstance().getDouble("ball.radius");
 
@@ -55,10 +57,11 @@ public class GameLoop extends AnimationTimer {
                 paddle.getX() + paddle.getWidth() / 2.0 - radius,
                 paddle.getY() - 1.5 * radius
         );
-        initialBall.setDy(Math.abs(initialBall.getDy())); // ✅ Asegura que la bola baje inicialmente
+        initialBall.setDy(Math.abs(initialBall.getDy()));
         balls.add(initialBall);
 
-        this.bricks = LevelLoader.loadLevel("levels/level1.json", this, ballSpawner);
+        this.bricks = LevelLoader.loadLevel(levelPath, this, ballSpawner);
+        System.out.println("🧱 bricks inicializados: " + (bricks != null ? bricks.size() : "null"));
     }
 
     @Override
@@ -104,32 +107,31 @@ public class GameLoop extends AnimationTimer {
 
     private void handleCollisions() {
         bricksRecentlyHit.clear();
-    
+
         for (Ball ball : balls) {
             double startX = ball.getPrevX();
             double startY = ball.getPrevY();
             double endX = ball.getX();
             double endY = ball.getY();
             double radius = ball.getRadius();
-    
+
             double dx = endX - startX;
             double dy = endY - startY;
-    
+
             Iterator<AbstractBrick> iterator = bricks.iterator();
             while (iterator.hasNext()) {
                 AbstractBrick brick = iterator.next();
-    
+
                 if (bricksRecentlyHit.contains(brick)) continue;
-    
-                // Inflar el brick con el radio de la bola
+
                 double bx = brick.getX() - radius;
                 double by = brick.getY() - radius;
                 double bw = brick.getWidth() + 2 * radius;
                 double bh = brick.getHeight() + 2 * radius;
-    
+
                 double tEntryX, tEntryY;
                 double tExitX, tExitY;
-    
+
                 if (dx == 0) {
                     tEntryX = Double.NEGATIVE_INFINITY;
                     tExitX = Double.POSITIVE_INFINITY;
@@ -137,7 +139,7 @@ public class GameLoop extends AnimationTimer {
                     tEntryX = (dx > 0 ? bx - startX : bx + bw - startX) / dx;
                     tExitX = (dx > 0 ? bx + bw - startX : bx - startX) / dx;
                 }
-    
+
                 if (dy == 0) {
                     tEntryY = Double.NEGATIVE_INFINITY;
                     tExitY = Double.POSITIVE_INFINITY;
@@ -145,38 +147,30 @@ public class GameLoop extends AnimationTimer {
                     tEntryY = (dy > 0 ? by - startY : by + bh - startY) / dy;
                     tExitY = (dy > 0 ? by + bh - startY : by - startY) / dy;
                 }
-    
+
                 double entryTime = Math.max(tEntryX, tEntryY);
                 double exitTime = Math.min(tExitX, tExitY);
-    
-                // Colisión válida solo si entra entre 0 y 1 y sale después
+
                 if (entryTime < exitTime && entryTime >= 0 && entryTime <= 1) {
-                    // Decide el eje de colisión
                     if (tEntryX > tEntryY) {
                         ball.setDx(-ball.getDx());
                     } else {
                         ball.setDy(-ball.getDy());
                     }
-    
+
                     brick.hit();
                     bricksRecentlyHit.add(brick);
-    
+
                     if (brick.isDestroyed()) {
                         addScore(brick.getScore());
                         iterator.remove();
                     }
-    
-                    // No procesamos más bricks en este frame para esta bola
+
                     break;
                 }
             }
         }
     }
-    
-        
-    
-    
-    
 
     private void render() {
         gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
@@ -199,7 +193,7 @@ public class GameLoop extends AnimationTimer {
         gc.fillText(text, (GameApp.WIDTH - textWidth) / 2, GameApp.HEIGHT / 2);
 
         gc.setFont(new Font(24));
-        String restartText = "Press SPACE to restart";
+        String restartText = "Press SPACE to return to menu";
         double restartWidth = calculateTextWidth(restartText, gc.getFont());
         gc.fillText(restartText, (GameApp.WIDTH - restartWidth) / 2, GameApp.HEIGHT / 2 + 50);
     }
@@ -228,6 +222,7 @@ public class GameLoop extends AnimationTimer {
     }
 
     public void renderStartMessage() {
+        gc.setFont(new Font(32)); // Más grande para mayor visibilidad
         String message = "Presiona ESPACIO para comenzar";
 
         double fontSize = gc.getFont().getSize();
@@ -313,7 +308,7 @@ public class GameLoop extends AnimationTimer {
 
     public void resetGame() {
         balls.clear();
-        bricks = LevelLoader.loadLevel("levels/level1.json", this, ballSpawner);
+        bricks = LevelLoader.loadLevel(levelPath, this, ballSpawner);
 
         totalScore = 0;
         LifeManager.getInstance().reset();
@@ -328,7 +323,7 @@ public class GameLoop extends AnimationTimer {
         balls.add(newBall);
 
         paddle.resetPosition();
-        System.out.println("Juego Reiniciado");
+        System.out.println("🎮 Juego Reiniciado");
     }
 
     private double calculateTextWidth(String text, Font font) {
