@@ -23,16 +23,26 @@ public class LevelLoader {
     private static List<AbstractBrick> loadFromJsonResource(String resourcePath, GameLoop gameLoop, BallSpawner spawner) {
         try (InputStream is = LevelLoader.class.getClassLoader().getResourceAsStream(resourcePath)) {
             if (is == null) {
+                System.err.println("❌ No se pudo encontrar el recurso: " + resourcePath);
                 throw new IllegalArgumentException("No se pudo encontrar el recurso: " + resourcePath);
             } else {
-                System.out.println("Cargando nivel JSON desde " + resourcePath);
+                System.out.println("✅ Cargando nivel JSON desde: " + resourcePath);
             }
-
-            return JsonLevelLoader.loadFromInputStream(is, gameLoop, spawner);
-
+    
+            List<AbstractBrick> bricks = JsonLevelLoader.loadFromInputStream(is, gameLoop, spawner);
+    
+            if (bricks == null || bricks.isEmpty()) {
+                System.err.println("⚠️ Nivel cargado pero sin ladrillos: " + resourcePath);
+            } else {
+                System.out.println("🧱 Ladrillos cargados: " + bricks.size());
+            }
+    
+            return bricks;
+    
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error al cargar el nivel desde " + resourcePath, e);
         }
     }
+    
 }
