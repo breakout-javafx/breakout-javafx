@@ -43,12 +43,17 @@ public class MultiBallBrickDecorator extends BrickDecorator {
 
     @Override
     public boolean isDestroyed() {
-        boolean destroyed = super.isDestroyed();
+        boolean destroyed = this.health <= 0;
         if (destroyed && !triggered) {
             triggered = true;
             spawnExtraBalls();
         }
         return destroyed;
+    }
+
+    @Override
+    public void hit() {
+        this.health--;
     }
 
     private void spawnExtraBalls() {
@@ -74,7 +79,7 @@ public class MultiBallBrickDecorator extends BrickDecorator {
         if (TEXTURE != null && !TEXTURE.isError()) {
             gc.drawImage(TEXTURE, x, y, width, height);
         } else {
-            gc.setFill(Color.GRAY); // Color de respaldo si falla la textura
+            gc.setFill(Color.GRAY);
             gc.fillRect(x, y, width, height);
         }
 
