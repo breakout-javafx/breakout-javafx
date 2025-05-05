@@ -2,8 +2,7 @@ package com.breakout.entities.ball;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.entities.ball.strategy.BallMovementStrategy;
-import com.breakout.entities.brick.decorator.StandardBrick;
-import javafx.geometry.Rectangle2D;
+
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -12,94 +11,61 @@ import java.util.Objects;
 
 public class Ball {
     private double x, y;
-    private double prevX, prevY; // ✅ Añadido: posición anterior
-
+    private double prevX, prevY;
     private double dx, dy;
-    private final double radius = 10;
+    private final double radius = ConfigLoader.getInstance().getDouble("ball.radius");
     private boolean active = true;
 
-    private static final Image TEXTURE;
-
-
-    static {
-        TEXTURE = new Image(
-                Objects.requireNonNull(StandardBrick.class.getResourceAsStream(
-                        ConfigLoader.getInstance().get("ball.texture"))),
-                0, 0, false, false
-        );
-        if (TEXTURE.isError()) {
-            System.err.println("No se pudo cargar la textura de la bola.");
-        }
-    }
-
+    private Image texture;
     private BallMovementStrategy movementStrategy;
 
     public Ball(double startX, double startY) {
         this.x = startX;
         this.y = startY;
-
         this.dx = ConfigLoader.getInstance().getDouble("ball.speed");
         this.dy = this.dx;
     }
 
+    public void setTexture(Image texture) {
+        this.texture = texture;
+    }
+
     public void update() {
-        // ✅ Guardamos la posición antes de mover
         prevX = x;
         prevY = y;
-
-        movementStrategy.move(this);
+        if (movementStrategy != null) {
+            movementStrategy.move(this);
+        }
     }
 
     public void render(GraphicsContext gc) {
-        if (TEXTURE != null && !TEXTURE.isError()) {
-            gc.drawImage(TEXTURE, x, y, radius, radius);
+        if (texture != null && !texture.isError()) {
+            gc.drawImage(texture, x, y, radius * 2, radius * 2);
         } else {
             gc.setFill(Color.RED);
-            gc.fillOval(x, y, radius, radius);
+            gc.fillOval(x, y, radius * 2, radius * 2);
         }
     }
 
-
-    public double getX() { return x; }
+    // Setters para compatibilidad
     public void setX(double x) { this.x = x; }
-
-    public double getY() { return y; }
     public void setY(double y) { this.y = y; }
-
-    public double getDx() { return dx; }
     public void setDx(double dx) { this.dx = dx; }
-
-    public double getDy() { return dy; }
     public void setDy(double dy) { this.dy = dy; }
+    public void setActive(boolean active) { this.active = active; }
+    public void setMovementStrategy(BallMovementStrategy strategy) { this.movementStrategy = strategy; }
 
-    public double getRadius() { return radius; }
-
-    public void invertY() {
-        dy *= -1;
-    }
-
-    public void setMovementStrategy(BallMovementStrategy strategy) {
-        this.movementStrategy = strategy;
-    }
-
-    public Rectangle2D getBounds() {
-        return new Rectangle2D(x - radius, y - radius, 2 * radius, 2 * radius);
-    }
-
-    public boolean isActive () {
-        return active;
-    }
-
-    public void setActive (boolean active) {
-        this.active = active;
-
-        if (!active) {
-            this.dx = 0;
-            this.dy = 0;
-        }
-    }
-
-    // ✅ Nuevos getters para colisión basada en movimiento
+    // Getters
+    public double getX() { return x; }
+    public double getY() { return y; }
     public double getPrevX() { return prevX; }
     public double getPrevY() { return prevY; }
+    public double getDx() { return dx; }
+    public double getDy() { return dy; }
+    public double getRadius() { return radius; }
+    public boolean isActive() { return active; }
+
+    public javafx.geometry.Bounds getBounds() {
+        return new javafx.geometry.BoundingBox(x, y, radius * 2, radius * 2);
+    }
 }

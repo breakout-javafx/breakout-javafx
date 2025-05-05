@@ -61,7 +61,6 @@ public class GameLoop extends AnimationTimer {
         balls.add(initialBall);
 
         this.bricks = LevelLoader.loadLevel(levelPath, this, ballSpawner);
-        System.out.println("🧱 bricks inicializados: " + (bricks != null ? bricks.size() : "null"));
     }
 
     @Override
@@ -222,7 +221,6 @@ public class GameLoop extends AnimationTimer {
     }
 
     public void renderStartMessage() {
-        gc.setFont(new Font(32)); // Más grande para mayor visibilidad
         String message = "Presiona ESPACIO para comenzar";
 
         double fontSize = gc.getFont().getSize();
@@ -323,7 +321,7 @@ public class GameLoop extends AnimationTimer {
         balls.add(newBall);
 
         paddle.resetPosition();
-        System.out.println("🎮 Juego Reiniciado");
+        System.out.println("Juego Reiniciado");
     }
 
     private double calculateTextWidth(String text, Font font) {
