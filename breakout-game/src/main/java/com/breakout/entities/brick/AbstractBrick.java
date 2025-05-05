@@ -26,7 +26,7 @@ public abstract class AbstractBrick {
     protected double x, y;
     protected double width, height;
     protected int score;   // Solo definición, no sumamos aquí
-    protected int health = 1;
+    protected int health = 8;
 
     public AbstractBrick(double x, double y, double width, double height) {
         this.x = x;
