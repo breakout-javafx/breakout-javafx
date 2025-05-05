@@ -73,6 +73,7 @@ public class GameApp extends Application {
         configureInput(scene);
 
         currentLoop.start();
+        currentLoop.startGame(); // ⬅️ Esto hace que el juego arranque al momento
     }
 
     private static void configureInput(Scene scene) {
