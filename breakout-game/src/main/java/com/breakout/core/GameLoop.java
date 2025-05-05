@@ -109,8 +109,8 @@ public class GameLoop extends AnimationTimer {
 
             for (Ball ball : balls) {
                 if (ball.getBounds().intersects(brick.getBounds())) {
-                    brick.hit();
                     ball.invertY();
+                    brick.hit();
 
                     if (brick.isDestroyed()) {
                         addScore(brick.getScore());

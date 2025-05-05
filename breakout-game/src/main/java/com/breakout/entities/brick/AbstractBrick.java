@@ -26,7 +26,7 @@ public abstract class AbstractBrick {
     protected double x, y;
     protected double width, height;
     protected int score;   // Solo definición, no sumamos aquí
-    protected int health = 8;
+    protected int health = 1;
 
     public AbstractBrick(double x, double y, double width, double height) {
         this.x = x;
@@ -59,6 +59,6 @@ public abstract class AbstractBrick {
     public int getScore() { return score; }
     public void setScore(int score) { this.score = score; }
 
-    public void hit() { health--; }
-    public boolean isDestroyed() { return health <= 0; }
+    public abstract void hit();
+    public abstract boolean isDestroyed();
 }

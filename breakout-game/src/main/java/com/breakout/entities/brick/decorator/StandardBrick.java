@@ -30,4 +30,15 @@ public class StandardBrick extends AbstractBrick {
         gc.setFill(color);
         gc.fillRect(x, y, width, height);
     }
+
+    @Override
+    public void hit() {
+        this.health--;
+    }
+
+    @Override
+    public boolean isDestroyed() {
+        return this.health <= 0;
+    }
+
 }
