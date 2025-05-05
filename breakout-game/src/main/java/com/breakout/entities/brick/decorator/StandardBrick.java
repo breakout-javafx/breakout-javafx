@@ -3,10 +3,24 @@ package com.breakout.entities.brick.decorator;
 import com.breakout.config.ConfigLoader;
 import com.breakout.entities.brick.AbstractBrick;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+
+import java.util.Objects;
 
 public class StandardBrick extends AbstractBrick {
     private Color color;
+
+    private static final Image TEXTURE;
+
+    static {
+        // Carga la imagen desde dentro del JAR (resources)
+        TEXTURE = new Image(Objects.requireNonNull(StandardBrick.class
+                .getResourceAsStream(ConfigLoader.getInstance().get("ball.decorator.standard.texture"))));
+        if (TEXTURE.isError()) {
+            System.err.println("No se pudo cargar la textura de StandardBrick.");
+        }
+    }
 
     public StandardBrick(double x, double y, double width, double height) {
         super(x, y,
@@ -21,14 +35,11 @@ public class StandardBrick extends AbstractBrick {
     protected void initializeShape() {}
 
     @Override
-    protected void initializeColor() {
-        this.color = Color.RED;
-    }
+    protected void initializeColor() {}
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(color);
-        gc.fillRect(x, y, width, height);
+        gc.drawImage(TEXTURE, x, y, width, height);
     }
 
     @Override

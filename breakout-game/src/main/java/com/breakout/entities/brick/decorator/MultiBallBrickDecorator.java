@@ -1,19 +1,30 @@
 package com.breakout.entities.brick.decorator;
 
 import com.breakout.config.ConfigLoader;
+import com.breakout.core.GameLoop;
 import com.breakout.entities.ball.Ball;
 import com.breakout.entities.ball.BallSpawner;
-import com.breakout.core.GameLoop;
 import com.breakout.entities.brick.AbstractBrick;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
+import javafx.scene.image.Image;
 
+import java.util.Objects;
 import java.util.Random;
 
 public class MultiBallBrickDecorator extends BrickDecorator {
     private final GameLoop gameLoop;
     private final BallSpawner ballSpawner;
     private boolean triggered = false;
+
+    private static final Image TEXTURE;
+
+    static {
+        TEXTURE = new Image(Objects.requireNonNull(MultiBallBrickDecorator.class.
+                getResourceAsStream(ConfigLoader.getInstance().get("ball.decorator.multiball.texture"))));
+        if (TEXTURE.isError()) {
+            System.err.println("No se pudo cargar la textura de MultiBallBrickDecorator.");
+        }
+    }
 
     public MultiBallBrickDecorator(AbstractBrick decoratedBrick, GameLoop gameLoop, BallSpawner ballSpawner) {
         super(decoratedBrick);
@@ -48,9 +59,7 @@ public class MultiBallBrickDecorator extends BrickDecorator {
 
     @Override
     public void render(GraphicsContext gc) {
-        super.render(gc);
-
-        gc.setFill(Color.BLUE);
-        gc.fillOval(x + width / 4, y + height / 4, width / 2, height / 2);
+        super.render(gc); // Render del ladrillo base
+        gc.drawImage(TEXTURE, x, y, width, height); // Textura extra decorativa
     }
 }
