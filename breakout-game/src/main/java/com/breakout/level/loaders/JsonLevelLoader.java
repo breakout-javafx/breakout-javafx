@@ -1,5 +1,6 @@
 package com.breakout.level.loaders;
 
+import com.breakout.core.GameApp;
 import com.breakout.core.GameLoop;
 import com.breakout.entities.ball.BallSpawner;
 import com.breakout.entities.brick.AbstractBrick;
@@ -26,8 +27,13 @@ public class JsonLevelLoader {
             JsonNode root = mapper.readTree(is);
 
             int width = root.get("width").asInt();
+            int height = root.get("height").asInt();
             JsonNode layer = root.get("layers").get(0);
             JsonNode data = layer.get("data");
+
+            // Calcula el desplazamiento necesario para centrar el grid en la pantalla
+            double offsetX = (GameApp.WIDTH - (width * TILE_WIDTH)) / 2.0;
+            double offsetY = (GameApp.HEIGHT - (height * TILE_HEIGHT)) / 2.0;
 
             for (int index = 0; index < data.size(); index++) {
                 int gid = data.get(index).asInt();
@@ -37,8 +43,9 @@ public class JsonLevelLoader {
                 int x = index % width;
                 int y = index / width;
 
-                double posX = x * TILE_WIDTH;
-                double posY = y * TILE_HEIGHT;
+                // Aplicamos el desplazamiento para centrar el grid
+                double posX = x * TILE_WIDTH + offsetX;
+                double posY = y * TILE_HEIGHT + offsetY;
 
                 AbstractBrick brick = createBrickFromGid(gid, posX, posY, gameLoop, spawner);
                 if (brick != null) {
@@ -61,9 +68,10 @@ public class JsonLevelLoader {
             case 9 -> new MultiBallBrickDecorator(
                     new StandardBrick(x, y, TILE_WIDTH, TILE_HEIGHT), gameLoop, spawner
             );
+            case 5 -> new GlowingBrickDecorator(
+                    new StandardBrick(x, y, TILE_WIDTH, TILE_HEIGHT)
+            );
             default -> null;
         };
     }
-
-
 }
