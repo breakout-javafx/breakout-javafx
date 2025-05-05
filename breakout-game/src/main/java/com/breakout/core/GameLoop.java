@@ -114,70 +114,95 @@ public class GameLoop extends AnimationTimer {
 
     private void handleCollisions() {
         bricksRecentlyHit.clear();
-
+    
         for (Ball ball : balls) {
             double startX = ball.getPrevX();
             double startY = ball.getPrevY();
             double endX = ball.getX();
             double endY = ball.getY();
             double radius = ball.getRadius();
-
+    
             double dx = endX - startX;
             double dy = endY - startY;
-
+    
+            AbstractBrick earliestBrick = null;
+            double earliestEntryTime = Double.POSITIVE_INFINITY;
+            boolean horizontal = false;
+    
             Iterator<AbstractBrick> iterator = bricks.iterator();
             while (iterator.hasNext()) {
                 AbstractBrick brick = iterator.next();
-
+    
                 if (bricksRecentlyHit.contains(brick)) continue;
-
-                double bx = brick.getX() - radius;
-                double by = brick.getY() - radius;
-                double bw = brick.getWidth() + 2 * radius;
-                double bh = brick.getHeight() + 2 * radius;
-
+    
+                // ⚠️ No expandimos el brick
+                double bx = brick.getX();
+                double by = brick.getY();
+                double bw = brick.getWidth();
+                double bh = brick.getHeight();
+    
                 double tEntryX, tEntryY;
                 double tExitX, tExitY;
-
+    
                 if (dx == 0) {
                     tEntryX = Double.NEGATIVE_INFINITY;
                     tExitX = Double.POSITIVE_INFINITY;
                 } else {
-                    tEntryX = (dx > 0 ? bx - startX : bx + bw - startX) / dx;
-                    tExitX = (dx > 0 ? bx + bw - startX : bx - startX) / dx;
+                    tEntryX = (dx > 0 ? bx - (startX + radius) : bx + bw - (startX - radius)) / dx;
+                    tExitX = (dx > 0 ? bx + bw - (startX + radius) : bx - (startX - radius)) / dx;
                 }
-
+    
                 if (dy == 0) {
                     tEntryY = Double.NEGATIVE_INFINITY;
                     tExitY = Double.POSITIVE_INFINITY;
                 } else {
-                    tEntryY = (dy > 0 ? by - startY : by + bh - startY) / dy;
-                    tExitY = (dy > 0 ? by + bh - startY : by - startY) / dy;
+                    tEntryY = (dy > 0 ? by - (startY + radius) : by + bh - (startY - radius)) / dy;
+                    tExitY = (dy > 0 ? by + bh - (startY + radius) : by - (startY - radius)) / dy;
                 }
-
+    
                 double entryTime = Math.max(tEntryX, tEntryY);
                 double exitTime = Math.min(tExitX, tExitY);
-
+    
                 if (entryTime < exitTime && entryTime >= 0 && entryTime <= 1) {
-                    if (tEntryX > tEntryY) {
-                        ball.setDx(-ball.getDx());
-                    } else {
-                        ball.setDy(-ball.getDy());
+                    if (entryTime < earliestEntryTime) {
+                        earliestEntryTime = entryTime;
+    
+                        // Mejora esquinas
+                        if (Math.abs(tEntryX - tEntryY) < 0.15) {
+                            horizontal = Math.abs(dx) > Math.abs(dy);
+                        } else {
+                            horizontal = tEntryX > tEntryY;
+                        }
+    
+                        earliestBrick = brick;
                     }
-
-                    brick.hit();
-                    bricksRecentlyHit.add(brick);
-
-                    if (brick.isDestroyed()) {
-                        addScore(brick.getScore());
-                        iterator.remove();
-                    }
-
-                    break;
+                }
+            }
+    
+            if (earliestBrick != null) {
+                if (horizontal) {
+                    ball.setX(startX + dx * earliestEntryTime + (dx > 0 ? 0.01 : -0.01));
+                    ball.setDx(-ball.getDx());
+                } else {
+                    ball.setY(startY + dy * earliestEntryTime + (dy > 0 ? 0.01 : -0.01));
+                    ball.setDy(-ball.getDy());
+                }
+    
+                earliestBrick.hit();
+                bricksRecentlyHit.add(earliestBrick);
+    
+                if (earliestBrick.isDestroyed()) {
+                    addScore(earliestBrick.getScore());
+                    bricks.remove(earliestBrick);
                 }
             }
         }
     }
+    
+    
+    
+    
+    
 
 private void render() {
     // Primero, dibujamos el fondo si hay una imagen o limpiamos la pantalla si no.
