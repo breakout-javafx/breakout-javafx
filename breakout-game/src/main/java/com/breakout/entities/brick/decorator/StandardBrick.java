@@ -12,8 +12,9 @@ public class StandardBrick extends AbstractBrick {
         super(x, y,
               ConfigLoader.getInstance().getInt("brick.width"),
               ConfigLoader.getInstance().getInt("brick.height"));
-        this.score = 10; // Score base
-        this.health = 1; // Vida base
+        this.score = ConfigLoader.getInstance().getInt("ball.decorator.standard.score");
+        this.health = ConfigLoader.getInstance().getInt("ball.decorator.standard.health");
+
     }
 
     @Override
@@ -29,4 +30,15 @@ public class StandardBrick extends AbstractBrick {
         gc.setFill(color);
         gc.fillRect(x, y, width, height);
     }
+
+    @Override
+    public void hit() {
+        this.health--;
+    }
+
+    @Override
+    public boolean isDestroyed() {
+        return this.health <= 0;
+    }
+
 }

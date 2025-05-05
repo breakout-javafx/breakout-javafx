@@ -19,6 +19,8 @@ public class MultiBallBrickDecorator extends BrickDecorator {
         super(decoratedBrick);
         this.gameLoop = gameLoop;
         this.ballSpawner = ballSpawner;
+        this.score = ConfigLoader.getInstance().getInt("ball.decorator.multiball.score");
+        this.health = ConfigLoader.getInstance().getInt("ball.decorator.multiball.health");
     }
 
     @Override

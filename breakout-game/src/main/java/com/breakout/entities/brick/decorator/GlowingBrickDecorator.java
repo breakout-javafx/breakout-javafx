@@ -1,5 +1,6 @@
 package com.breakout.entities.brick.decorator;
 
+import com.breakout.config.ConfigLoader;
 import com.breakout.entities.brick.AbstractBrick;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -8,7 +9,8 @@ public class GlowingBrickDecorator extends BrickDecorator {
 
     public GlowingBrickDecorator(AbstractBrick decoratedBrick) {
         super(decoratedBrick);
-        this.score = decoratedBrick.getScore() + 20; // GlowingBrick suma +20 puntos
+        this.score = ConfigLoader.getInstance().getInt("ball.decorator.glowing.score");
+        this.health = ConfigLoader.getInstance().getInt("ball.decorator.glowing.health");
     }
 
     @Override
