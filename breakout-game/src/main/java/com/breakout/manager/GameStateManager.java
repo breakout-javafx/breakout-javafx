@@ -26,6 +26,8 @@ public class GameStateManager {
     private List<Ball> balls = new ArrayList<>();
     private List<AbstractBrick> bricks = new ArrayList<>();
     private int score = 0;
+    private boolean processingLifeLoss = false; // Nueva variable de estado
+    private boolean processingBallLoss = false;
 
     private GameStateManager() {}
 
@@ -105,32 +107,56 @@ public class GameStateManager {
     }
 
     public void loseLife() {
+        if (gameOver) return;
+
+        System.out.println("[GSM] Procesando eliminación de vida");
+    
         LifeManager.getInstance().decreaseLife();
 
         if (LifeManager.getInstance().getLives() <= 0) {
             gameOver();
         } else {
-            spawnNewBall();
+            // Solo spawnear nueva bola si no hay bolas activas
+            if (gameLoop != null && gameLoop.getActiveBallCount() == 0) {
+                spawnNewBall();
+            }
         }
     }
 
     private void spawnNewBall() {
-        Ball ball = ballSpawner.spawnBall(
+        if (gameLoop == null || gameOver) return;
+    
+        try {
+            // Pequeña pausa para dar feedback visual
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    
+        Ball newBall = ballSpawner.spawnBall(
             gameLoop.getPaddle().getX() + gameLoop.getPaddle().getWidth() / 2,
             gameLoop.getPaddle().getY() - Ball.RADIUS
         );
-        gameLoop.addBall(ball);
-        gameStarted = false;
-
-        // Actualizamos el data pool
-        GameDataPool.getInstance().addBall(ball);
-        GameDataPool.getInstance().setGameStarted(false);
+    
+        // Resetear velocidad para asegurar movimiento hacia arriba
+        newBall.setDy(Math.abs(newBall.getDy()));
+        gameLoop.addBall(newBall);
+    
+        System.out.println("[GSM] Nueva bola creada en (" + newBall.getX() + "," + newBall.getY() + ")");
     }
 
     public void gameOver() {
-        this.gameOver = true;
-        // Actualizamos el data pool
-        GameDataPool.getInstance().setGameOver(true);
+        if (!this.gameOver) {
+            System.out.println("[GameStateManager] Activando Game Over");
+            this.gameOver = true;
+            GameDataPool.getInstance().setGameOver(true);
+            
+            // Forzar renderizado final
+            if (gameLoop != null) {
+                gameLoop.renderGameOver();
+                gameLoop.stop();
+            }
+        }
     }
 
     public boolean isGameStarted() {
@@ -151,5 +177,27 @@ public class GameStateManager {
 
     public List<AbstractBrick> getBricks() {
         return bricks;
+    }
+
+    public void notifyBallLost () {
+        if (gameOver) {
+            System.out.println("[JUEGO] Ignorando pérdida de bola - Juego ya terminado");
+            return;
+        }
+        
+        System.out.println("[JUEGO] Procesando pérdida de última bola");
+        LifeManager.getInstance().decreaseLife();
+        
+        if (LifeManager.getInstance().getLives() <= 0) {
+            gameOver();
+        } else {
+            // Pequeña pausa para feedback visual
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            spawnNewBall();
+        }
     }
 }

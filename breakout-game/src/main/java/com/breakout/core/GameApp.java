@@ -4,42 +4,47 @@ import com.breakout.config.ConfigLoader;
 import com.breakout.level.facade.LevelLoader;
 import com.breakout.manager.GameStateManager;
 import com.breakout.manager.LifeManager;
-
+import com.breakout.ui.LevelMenu;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.scene.input.KeyCode;
 
 public class GameApp extends Application {
+
     public static int WIDTH;
     public static int HEIGHT;
     private static final String TITLE = ConfigLoader.getInstance().get("game.tittle");
     GameStateManager gsm = GameStateManager.getInstance();
 
-    //TODO ENCARGARSE DE QUE SE USE EL SEETING DE REDIO DE BOLA AL GENERAR LA BOLA
-    //LÓGICA DE ELIMINAR BOLAS AL TOCAR LA BASE DE LA PANTALLA
-    //LÓGICA DE TERMINAR PARTIDA SI NOS QUEDAMOS SIN BOLAS
+    private static Stage primaryStage;
+    private static GameLoop currentLoop;
+
+    // ✅ NUEVO: textura de fondo
+    private static Image backgroundImage;
 
     @Override
-    public void start(Stage primaryStage) {
-        // Configuración base
+    public void start(Stage stage) {
+        primaryStage = stage;
+
+        // Escalar y configurar ventana
         initializeWindow(primaryStage);
 
-        // Crear y mostrar el canvas y escena
-        Canvas canvas = createCanvas(primaryStage);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+        // Crear el contenedor principal (StackPane)
+        StackPane root = new StackPane();
 
-        // Crear el GameLoop
-        GameLoop loop = new GameLoop(gc);
-        loop.start();
+        // Crear la escena y asignarla al stage
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
+        primaryStage.setScene(scene);
 
-        GameStateManager.getInstance().setGameLoop(loop);
+        // Cargar textura de fondo desde config
+        loadBackgroundTexture();
 
         // Establezco el LifeManager y el LevelLoader
         GameStateManager gameStateManager = GameStateManager.getInstance();
@@ -47,24 +52,23 @@ public class GameApp extends Application {
         gameStateManager.setLevelLoader(new LevelLoader());
 
         // Configurar los eventos de entrada
-        configureInput(primaryStage.getScene(), loop);
+        configureInput(scene);
+
+        // Mostrar menú de selección de nivel
+        new LevelMenu(primaryStage).show();
     }
 
-    private void initializeWindow(Stage primaryStage) {
-        // Obtener las dimensiones de la pantalla
+    private void initializeWindow(Stage stage) {
         int baseWidth = ConfigLoader.getInstance().getInt("window.width");
         int baseHeight = ConfigLoader.getInstance().getInt("window.height");
 
-        // Escalar la ventana
         scaleWindow(baseWidth, baseHeight);
 
-        // Configuración de la ventana
-        primaryStage.setTitle(TITLE);
-        primaryStage.setFullScreen(true);  // Pantalla completa
-        primaryStage.setFullScreenExitHint(""); // Opcional
-        primaryStage.centerOnScreen();
-        primaryStage.toFront();
-
+        stage.setTitle(TITLE);
+        stage.setFullScreen(true);
+        stage.setFullScreenExitHint("");
+        stage.centerOnScreen();
+        stage.toFront();
     }
 
     private void scaleWindow(int baseWidth, int baseHeight) {
@@ -77,43 +81,86 @@ public class GameApp extends Application {
         HEIGHT = (int) (baseHeight * scale);
     }
 
-    private Canvas createCanvas(Stage primaryStage) {
+    /**
+     * Método llamado desde LevelMenu al seleccionar un nivel.
+     */
+    public static void startGame(String levelPath) {
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        currentLoop = new GameLoop(gc, levelPath);
 
         StackPane root = new StackPane(canvas);
         root.setPrefSize(WIDTH, HEIGHT);
         Scene scene = new Scene(root);
-
-        // Mostrar la ventana
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        return canvas;
+        configureInput(scene);
+
+        currentLoop.start();
+        currentLoop.startGame();
     }
 
-    private void configureInput(Scene scene, GameLoop loop) {
+    private static void configureInput(Scene scene) {
+        if (scene == null) {
+            throw new IllegalArgumentException("La escena no puede ser null");
+        }
+
         scene.getRoot().setFocusTraversable(true);
         scene.getRoot().requestFocus();
 
         scene.setOnKeyPressed(e -> {
             GameStateManager gsm = GameStateManager.getInstance();
-            if (e.getCode() == KeyCode.LEFT) loop.setLeftPressed(true);
-            if (e.getCode() == KeyCode.RIGHT) loop.setRightPressed(true);
+
+            if (e.getCode() == KeyCode.LEFT) {
+                currentLoop.setLeftPressed(true);
+            }
+            if (e.getCode() == KeyCode.RIGHT) {
+                currentLoop.setRightPressed(true);
+            }
+
             if (e.getCode() == KeyCode.SPACE) {
                 if (gsm.isGameOver()) {
                     gsm.restartGame();
-                    loop.resetGame();
+                    currentLoop.resetGame();
                 } else {
                     gsm.startGame();
-                    loop.start();
+                    currentLoop.startGame();
                 }
             }
         });
 
         scene.setOnKeyReleased(e -> {
-            if (e.getCode() == KeyCode.LEFT) loop.setLeftPressed(false);
-            if (e.getCode() == KeyCode.RIGHT) loop.setRightPressed(false);
+            if (e.getCode() == KeyCode.LEFT) {
+                currentLoop.setLeftPressed(false);
+            }
+            if (e.getCode() == KeyCode.RIGHT) {
+                currentLoop.setRightPressed(false);
+            }
         });
+    }
+
+    private void loadBackgroundTexture() {
+        String path = ConfigLoader.getInstance().get("background.texture");
+        System.out.println("🧩 Cargando fondo desde: " + path);
+
+        try {
+            var url = getClass().getClassLoader().getResource(path);
+            if (url == null) {
+                System.err.println("❌ No se encontró el recurso de fondo en el JAR: " + path);
+                return;
+            }
+            backgroundImage = new Image(url.toExternalForm());
+            System.out.println("✅ Fondo cargado correctamente.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("❌ Error cargando la imagen de fondo.");
+        }
+    }
+
+    // ✅ NUEVO: getter para acceder desde GameLoop
+    public static Image getBackgroundImage() {
+        return backgroundImage;
     }
 }

@@ -9,26 +9,28 @@ import javafx.scene.paint.Color;
 import java.util.Objects;
 
 public class StandardBrick extends AbstractBrick {
-    private Color color;
-
     private static final Image TEXTURE;
 
     static {
-        // Carga la imagen desde dentro del JAR (resources)
-        TEXTURE = new Image(Objects.requireNonNull(StandardBrick.class
-                .getResourceAsStream(ConfigLoader.getInstance().get("ball.decorator.standard.texture"))));
+        TEXTURE = new Image(
+                Objects.requireNonNull(StandardBrick.class.getResourceAsStream(
+                        ConfigLoader.getInstance().get("brick.decorator.standard.texture"))),
+                0, 0, false, false
+        );
         if (TEXTURE.isError()) {
             System.err.println("No se pudo cargar la textura de StandardBrick.");
         }
     }
 
+    private final int maxHealth;
+
     public StandardBrick(double x, double y, double width, double height) {
         super(x, y,
-              ConfigLoader.getInstance().getInt("brick.width"),
-              ConfigLoader.getInstance().getInt("brick.height"));
-        this.score = ConfigLoader.getInstance().getInt("ball.decorator.standard.score");
-        this.health = ConfigLoader.getInstance().getInt("ball.decorator.standard.health");
-
+                ConfigLoader.getInstance().getInt("brick.width"),
+                ConfigLoader.getInstance().getInt("brick.height"));
+        this.score = ConfigLoader.getInstance().getInt("brick.decorator.standard.score");
+        this.health = ConfigLoader.getInstance().getInt("brick.decorator.standard.health");
+        this.maxHealth = this.health;
     }
 
     @Override
@@ -39,8 +41,19 @@ public class StandardBrick extends AbstractBrick {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.drawImage(TEXTURE, x, y, width, height);
+        double opacity = Math.max(0.2, (double) health / maxHealth);
+        gc.setGlobalAlpha(opacity);
+
+        if (TEXTURE != null && !TEXTURE.isError()) {
+            gc.drawImage(TEXTURE, x, y, width, height);
+        } else {
+            gc.setFill(Color.GRAY); // color alternativo si falla la textura
+            gc.fillRect(x, y, width, height);
+        }
+
+        gc.setGlobalAlpha(1.0);
     }
+
 
     @Override
     public void hit() {
@@ -51,5 +64,4 @@ public class StandardBrick extends AbstractBrick {
     public boolean isDestroyed() {
         return this.health <= 0;
     }
-
 }
