@@ -15,9 +15,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.scene.input.KeyCode;
-
-import java.util.Objects;
 
 public class GameApp extends Application {
 
@@ -39,10 +36,15 @@ public class GameApp extends Application {
         // Escalar y configurar ventana
         initializeWindow(primaryStage);
 
+        // Crear el contenedor principal (StackPane)
+        StackPane root = new StackPane();
+
+        // Crear la escena y asignarla al stage
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
+        primaryStage.setScene(scene);
+
         // Cargar textura de fondo desde config
         loadBackgroundTexture();
-
-        GameStateManager.getInstance().setGameLoop(loop);
 
         // Establezco el LifeManager y el LevelLoader
         GameStateManager gameStateManager = GameStateManager.getInstance();
@@ -50,7 +52,8 @@ public class GameApp extends Application {
         gameStateManager.setLevelLoader(new LevelLoader());
 
         // Configurar los eventos de entrada
-        configureInput(primaryStage.getScene(), loop);
+        configureInput(scene);
+
         // Mostrar menú de selección de nivel
         new LevelMenu(primaryStage).show();
     }
@@ -99,61 +102,62 @@ public class GameApp extends Application {
         currentLoop.startGame();
     }
 
-private static void configureInput(Scene scene) {
-    scene.getRoot().setFocusTraversable(true);
-    scene.getRoot().requestFocus();
-
-    scene.setOnKeyPressed(e -> {
-        GameStateManager gsm = GameStateManager.getInstance();
-
-        if (e.getCode() == KeyCode.LEFT) {
-            currentLoop.setLeftPressed(true);
-        }
-        if (e.getCode() == KeyCode.RIGHT) {
-            currentLoop.setRightPressed(true);
+    private static void configureInput(Scene scene) {
+        if (scene == null) {
+            throw new IllegalArgumentException("La escena no puede ser null");
         }
 
-        if (e.getCode() == KeyCode.SPACE) {
-            if (gsm.isGameOver()) {
-                gsm.restartGame();
-                currentLoop.resetGame();
-            } else {
-                gsm.startGame();
-                currentLoop.startGame(); 
+        scene.getRoot().setFocusTraversable(true);
+        scene.getRoot().requestFocus();
+
+        scene.setOnKeyPressed(e -> {
+            GameStateManager gsm = GameStateManager.getInstance();
+
+            if (e.getCode() == KeyCode.LEFT) {
+                currentLoop.setLeftPressed(true);
             }
-        }
-    });
+            if (e.getCode() == KeyCode.RIGHT) {
+                currentLoop.setRightPressed(true);
+            }
 
-    scene.setOnKeyReleased(e -> {
-        if (e.getCode() == KeyCode.LEFT) {
-            currentLoop.setLeftPressed(false);
-        }
-        if (e.getCode() == KeyCode.RIGHT) {
-            currentLoop.setRightPressed(false);
-        }
-    });
-}
+            if (e.getCode() == KeyCode.SPACE) {
+                if (gsm.isGameOver()) {
+                    gsm.restartGame();
+                    currentLoop.resetGame();
+                } else {
+                    gsm.startGame();
+                    currentLoop.startGame();
+                }
+            }
+        });
 
+        scene.setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.LEFT) {
+                currentLoop.setLeftPressed(false);
+            }
+            if (e.getCode() == KeyCode.RIGHT) {
+                currentLoop.setRightPressed(false);
+            }
+        });
+    }
 
     private void loadBackgroundTexture() {
         String path = ConfigLoader.getInstance().get("background.texture");
         System.out.println("🧩 Cargando fondo desde: " + path);
-    
+
         try {
             var url = getClass().getClassLoader().getResource(path);
             if (url == null) {
                 System.err.println("❌ No se encontró el recurso de fondo en el JAR: " + path);
                 return;
             }
-            backgroundImage = new Image(url.toExternalForm()); // ✅ JAR-safe
+            backgroundImage = new Image(url.toExternalForm());
             System.out.println("✅ Fondo cargado correctamente.");
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("❌ Error cargando la imagen de fondo.");
         }
     }
-    
-    
 
     // ✅ NUEVO: getter para acceder desde GameLoop
     public static Image getBackgroundImage() {

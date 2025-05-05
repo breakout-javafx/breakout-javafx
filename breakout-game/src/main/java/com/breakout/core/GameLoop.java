@@ -35,6 +35,8 @@ public class GameLoop extends AnimationTimer {
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
+    private boolean gameStarted = false;
+    private boolean gameOver = false;
 
     private long lastUpdateTime = 0;
     private int totalScore = 0;
