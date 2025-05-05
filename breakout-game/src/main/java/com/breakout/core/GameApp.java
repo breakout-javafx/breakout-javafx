@@ -1,6 +1,10 @@
 package com.breakout.core;
 
 import com.breakout.config.ConfigLoader;
+import com.breakout.level.facade.LevelLoader;
+import com.breakout.manager.GameStateManager;
+import com.breakout.manager.LifeManager;
+
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -10,12 +14,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.scene.input.KeyCode;
 
 public class GameApp extends Application {
     public static int WIDTH;
     public static int HEIGHT;
     private static final String TITLE = ConfigLoader.getInstance().get("game.tittle");
-
+    GameStateManager gsm = GameStateManager.getInstance();
 
     //TODO ENCARGARSE DE QUE SE USE EL SEETING DE REDIO DE BOLA AL GENERAR LA BOLA
     //LÓGICA DE ELIMINAR BOLAS AL TOCAR LA BASE DE LA PANTALLA
@@ -33,6 +38,13 @@ public class GameApp extends Application {
         // Crear el GameLoop
         GameLoop loop = new GameLoop(gc);
         loop.start();
+
+        GameStateManager.getInstance().setGameLoop(loop);
+
+        // Establezco el LifeManager y el LevelLoader
+        GameStateManager gameStateManager = GameStateManager.getInstance();
+        gameStateManager.setLifeManager(LifeManager.getInstance());
+        gameStateManager.setLevelLoader(new LevelLoader());
 
         // Configurar los eventos de entrada
         configureInput(primaryStage.getScene(), loop);
@@ -85,15 +97,16 @@ public class GameApp extends Application {
         scene.getRoot().requestFocus();
 
         scene.setOnKeyPressed(e -> {
+            GameStateManager gsm = GameStateManager.getInstance();
             if (e.getCode() == KeyCode.LEFT) loop.setLeftPressed(true);
             if (e.getCode() == KeyCode.RIGHT) loop.setRightPressed(true);
             if (e.getCode() == KeyCode.SPACE) {
-                if (loop.isGameOver()) {
-                    // Reinicio
+                if (gsm.isGameOver()) {
+                    gsm.restartGame();
                     loop.resetGame();
-                    loop.startGame();
                 } else {
-                    loop.startGame();
+                    gsm.startGame();
+                    loop.start();
                 }
             }
         });

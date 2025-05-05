@@ -6,6 +6,7 @@ import com.breakout.entities.ball.BallSpawner;
 import com.breakout.entities.brick.AbstractBrick;
 import com.breakout.entities.paddle.Paddle;
 import com.breakout.level.facade.LevelLoader;
+import com.breakout.manager.GameStateManager;
 import com.breakout.manager.LifeManager;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
@@ -33,8 +34,6 @@ public class GameLoop extends AnimationTimer {
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
-    private boolean gameStarted = false;
-    private boolean gameOver = false;
 
     private long lastUpdateTime = 0;
     private int totalScore = 0;
@@ -47,7 +46,7 @@ public class GameLoop extends AnimationTimer {
                 GameApp.HEIGHT - ConfigLoader.getInstance().getInt("paddle.height")
         );
 
-        this.ballSpawner = new BallSpawner(paddle); // ✅ Se pasa el paddle al spawner
+        this.ballSpawner = new BallSpawner(paddle);
 
         double radius = ConfigLoader.getInstance().getDouble("ball.radius");
 
@@ -55,10 +54,12 @@ public class GameLoop extends AnimationTimer {
                 paddle.getX() + paddle.getWidth() / 2.0 - radius,
                 paddle.getY() - 1.5 * radius
         );
-        initialBall.setDy(Math.abs(initialBall.getDy())); // ✅ Asegura que la bola baje inicialmente
+        initialBall.setDy(Math.abs(initialBall.getDy()));
         balls.add(initialBall);
 
         this.bricks = LevelLoader.loadLevel("levels/level1.json", this, ballSpawner);
+        GameStateManager.getInstance().setGameLoop(this);
+        GameStateManager.getInstance().setPaddle(paddle);
     }
 
     @Override
@@ -71,7 +72,11 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void update() {
-        if (!gameStarted || gameOver) return;
+        GameStateManager gsm = GameStateManager.getInstance();
+
+        if (!gsm.isGameStarted() || gsm.isGameOver()) {
+            return;
+        }
 
         updateBalls();
         updatePaddle();
@@ -172,22 +177,18 @@ public class GameLoop extends AnimationTimer {
             }
         }
     }
-    
-        
-    
-    
-    
 
     private void render() {
         gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
 
-        if (!gameOver && gameStarted) {
-            renderGameElements();
-        }
-        if (gameOver) {
+        GameStateManager gsm = GameStateManager.getInstance();
+        
+        if (gsm.isGameOver()) {
             renderGameOver();
-        } else if (!gameStarted) {
+        } else if (!gsm.isGameStarted()) {
             renderStartMessage();
+        } else {
+            renderGameElements();
         }
     }
 
@@ -268,14 +269,9 @@ public class GameLoop extends AnimationTimer {
     public Paddle getPaddle() { return paddle; }
 
     public void startGame() {
-        if (gameOver) {
+        GameStateManager gsm = GameStateManager.getInstance();
+        if (gsm.isGameOver()) {
             resetGame();
-            gameStarted = true;
-        } else if (!gameStarted) {
-            gameStarted = true;
-            if (balls.isEmpty()) {
-                spawnNewBall();
-            }
         }
     }
 
@@ -285,50 +281,22 @@ public class GameLoop extends AnimationTimer {
 
     private void handleBallLost() {
         if (balls.isEmpty()) {
-            if (LifeManager.getInstance().getLives() > 0) {
-                spawnNewBall();
-                gameStarted = false;
-            } else {
-                gameOver();
-            }
+            GameStateManager.getInstance().loseLife();
         }
     }
 
-    private void spawnNewBall() {
-        Ball newBall = ballSpawner.spawnBall(
-                paddle.getX() + paddle.getWidth() / 2,
-                paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius")
-        );
-        balls.add(newBall);
-        gameStarted = false;
-    }
-
-    private void gameOver() {
-        gameOver = true;
-    }
-
-    public boolean isGameOver() {
-        return gameOver;
-    }
-
     public void resetGame() {
+        GameStateManager gsm = GameStateManager.getInstance();
+        gsm.restartGame(); // Delegar en GameStateManager
+    
+        // Mantén solo la lógica gráfica/local:
         balls.clear();
         bricks = LevelLoader.loadLevel("levels/level1.json", this, ballSpawner);
-
-        totalScore = 0;
-        LifeManager.getInstance().reset();
-
-        gameStarted = false;
-        gameOver = false;
-
-        Ball newBall = ballSpawner.spawnBall(
-                paddle.getX() + paddle.getWidth() / 2,
-                paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius")
-        );
+        Ball newBall = ballSpawner.spawnBall(paddle.getX() + paddle.getWidth() / 2,
+        paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius"));
         balls.add(newBall);
-
         paddle.resetPosition();
-        System.out.println("Juego Reiniciado");
+        totalScore = 0;
     }
 
     private double calculateTextWidth(String text, Font font) {
