@@ -19,6 +19,8 @@ public class Ball {
     private Image texture;
     private BallMovementStrategy movementStrategy;
 
+    public static final double RADIUS = 10;
+
     public Ball(double startX, double startY) {
         this.x = startX;
         this.y = startY;

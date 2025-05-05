@@ -1,6 +1,9 @@
 package com.breakout.core;
 
 import com.breakout.config.ConfigLoader;
+import com.breakout.level.facade.LevelLoader;
+import com.breakout.manager.GameStateManager;
+import com.breakout.manager.LifeManager;
 import com.breakout.ui.LevelMenu;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -12,6 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.scene.input.KeyCode;
 
 import java.util.Objects;
 
@@ -20,6 +24,7 @@ public class GameApp extends Application {
     public static int WIDTH;
     public static int HEIGHT;
     private static final String TITLE = ConfigLoader.getInstance().get("game.tittle");
+    GameStateManager gsm = GameStateManager.getInstance();
 
     private static Stage primaryStage;
     private static GameLoop currentLoop;
@@ -37,6 +42,15 @@ public class GameApp extends Application {
         // Cargar textura de fondo desde config
         loadBackgroundTexture();
 
+        GameStateManager.getInstance().setGameLoop(loop);
+
+        // Establezco el LifeManager y el LevelLoader
+        GameStateManager gameStateManager = GameStateManager.getInstance();
+        gameStateManager.setLifeManager(LifeManager.getInstance());
+        gameStateManager.setLevelLoader(new LevelLoader());
+
+        // Configurar los eventos de entrada
+        configureInput(primaryStage.getScene(), loop);
         // Mostrar menú de selección de nivel
         new LevelMenu(primaryStage).show();
     }
@@ -85,28 +99,41 @@ public class GameApp extends Application {
         currentLoop.startGame();
     }
 
-    private static void configureInput(Scene scene) {
-        scene.getRoot().setFocusTraversable(true);
-        scene.getRoot().requestFocus();
+private static void configureInput(Scene scene) {
+    scene.getRoot().setFocusTraversable(true);
+    scene.getRoot().requestFocus();
 
-        scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.LEFT) currentLoop.setLeftPressed(true);
-            if (e.getCode() == KeyCode.RIGHT) currentLoop.setRightPressed(true);
+    scene.setOnKeyPressed(e -> {
+        GameStateManager gsm = GameStateManager.getInstance();
 
-            if (e.getCode() == KeyCode.SPACE) {
-                if (currentLoop.isGameOver()) {
-                    new LevelMenu(primaryStage).show();
-                } else {
-                    currentLoop.startGame();
-                }
+        if (e.getCode() == KeyCode.LEFT) {
+            currentLoop.setLeftPressed(true);
+        }
+        if (e.getCode() == KeyCode.RIGHT) {
+            currentLoop.setRightPressed(true);
+        }
+
+        if (e.getCode() == KeyCode.SPACE) {
+            if (gsm.isGameOver()) {
+                gsm.restartGame();
+                currentLoop.resetGame();
+            } else {
+                gsm.startGame();
+                currentLoop.startGame(); 
             }
-        });
+        }
+    });
 
-        scene.setOnKeyReleased(e -> {
-            if (e.getCode() == KeyCode.LEFT) currentLoop.setLeftPressed(false);
-            if (e.getCode() == KeyCode.RIGHT) currentLoop.setRightPressed(false);
-        });
-    }
+    scene.setOnKeyReleased(e -> {
+        if (e.getCode() == KeyCode.LEFT) {
+            currentLoop.setLeftPressed(false);
+        }
+        if (e.getCode() == KeyCode.RIGHT) {
+            currentLoop.setRightPressed(false);
+        }
+    });
+}
+
 
     private void loadBackgroundTexture() {
         String path = ConfigLoader.getInstance().get("background.texture");
