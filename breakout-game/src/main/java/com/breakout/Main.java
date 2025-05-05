@@ -2,7 +2,6 @@ package com.breakout;
 
 import com.breakout.core.GameApp;
 import javafx.application.Application;
-
 /**
  * La clase Main que inicia la aplicación del juego.
  */
