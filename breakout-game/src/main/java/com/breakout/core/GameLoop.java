@@ -21,6 +21,8 @@ public class GameLoop extends AnimationTimer {
 
     private static final double TARGET_FPS = Math.max(ConfigLoader.getInstance().getInt("game.fps"), 30);
     private static final double NANOS_PER_UPDATE = 1_000_000_000.0 / TARGET_FPS;
+    
+    private final List<AbstractBrick> bricksRecentlyHit = new ArrayList<>();
 
     private final GraphicsContext gc;
     private final List<Ball> balls = new ArrayList<>();
@@ -101,27 +103,80 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void handleCollisions() {
-        // 🧹 Eliminada colisión directa con el paddle: ahora se maneja dentro de la estrategia
-
-        Iterator<AbstractBrick> iterator = bricks.iterator();
-        while (iterator.hasNext()) {
-            AbstractBrick brick = iterator.next();
-
-            for (Ball ball : balls) {
-                if (ball.getBounds().intersects(brick.getBounds())) {
-                    ball.invertY();
+        bricksRecentlyHit.clear();
+    
+        for (Ball ball : balls) {
+            double startX = ball.getPrevX();
+            double startY = ball.getPrevY();
+            double endX = ball.getX();
+            double endY = ball.getY();
+            double radius = ball.getRadius();
+    
+            double dx = endX - startX;
+            double dy = endY - startY;
+    
+            Iterator<AbstractBrick> iterator = bricks.iterator();
+            while (iterator.hasNext()) {
+                AbstractBrick brick = iterator.next();
+    
+                if (bricksRecentlyHit.contains(brick)) continue;
+    
+                // Inflar el brick con el radio de la bola
+                double bx = brick.getX() - radius;
+                double by = brick.getY() - radius;
+                double bw = brick.getWidth() + 2 * radius;
+                double bh = brick.getHeight() + 2 * radius;
+    
+                double tEntryX, tEntryY;
+                double tExitX, tExitY;
+    
+                if (dx == 0) {
+                    tEntryX = Double.NEGATIVE_INFINITY;
+                    tExitX = Double.POSITIVE_INFINITY;
+                } else {
+                    tEntryX = (dx > 0 ? bx - startX : bx + bw - startX) / dx;
+                    tExitX = (dx > 0 ? bx + bw - startX : bx - startX) / dx;
+                }
+    
+                if (dy == 0) {
+                    tEntryY = Double.NEGATIVE_INFINITY;
+                    tExitY = Double.POSITIVE_INFINITY;
+                } else {
+                    tEntryY = (dy > 0 ? by - startY : by + bh - startY) / dy;
+                    tExitY = (dy > 0 ? by + bh - startY : by - startY) / dy;
+                }
+    
+                double entryTime = Math.max(tEntryX, tEntryY);
+                double exitTime = Math.min(tExitX, tExitY);
+    
+                // Colisión válida solo si entra entre 0 y 1 y sale después
+                if (entryTime < exitTime && entryTime >= 0 && entryTime <= 1) {
+                    // Decide el eje de colisión
+                    if (tEntryX > tEntryY) {
+                        ball.setDx(-ball.getDx());
+                    } else {
+                        ball.setDy(-ball.getDy());
+                    }
+    
                     brick.hit();
-
+                    bricksRecentlyHit.add(brick);
+    
                     if (brick.isDestroyed()) {
                         addScore(brick.getScore());
                         iterator.remove();
                     }
-
+    
+                    // No procesamos más bricks en este frame para esta bola
                     break;
                 }
             }
         }
     }
+    
+        
+    
+    
+    
 
     private void render() {
         gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
