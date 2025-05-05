@@ -85,7 +85,6 @@ public class GameLoop extends AnimationTimer {
 
     private void updateBalls() {
         Iterator<Ball> iterator = balls.iterator();
-        boolean ballLost = false;
 
         while (iterator.hasNext()) {
             Ball ball = iterator.next();
@@ -93,11 +92,10 @@ public class GameLoop extends AnimationTimer {
 
             if (!ball.isActive()) {
                 iterator.remove();
-                ballLost = true;
             }
         }
 
-        if (ballLost) {
+        if (balls.isEmpty() && GameStateManager.getInstance().isGameStarted()) {
             handleBallLost();
         }
     }
