@@ -15,23 +15,29 @@ public class MultiBallBrickDecorator extends BrickDecorator {
     private final GameLoop gameLoop;
     private final BallSpawner ballSpawner;
     private boolean triggered = false;
+    private final int maxHealth;
 
     private static final Image TEXTURE;
 
     static {
-        TEXTURE = new Image(Objects.requireNonNull(MultiBallBrickDecorator.class.
-                getResourceAsStream(ConfigLoader.getInstance().get("ball.decorator.multiball.texture"))));
+        TEXTURE = new Image(
+                Objects.requireNonNull(StandardBrick.class.getResourceAsStream(
+                        ConfigLoader.getInstance().get("brick.decorator.multiball.texture"))),
+                0, 0, false, false
+        );
         if (TEXTURE.isError()) {
-            System.err.println("No se pudo cargar la textura de MultiBallBrickDecorator.");
+            System.err.println("No se pudo cargar la textura de StandardBrick.");
         }
     }
+
 
     public MultiBallBrickDecorator(AbstractBrick decoratedBrick, GameLoop gameLoop, BallSpawner ballSpawner) {
         super(decoratedBrick);
         this.gameLoop = gameLoop;
         this.ballSpawner = ballSpawner;
-        this.score = ConfigLoader.getInstance().getInt("ball.decorator.multiball.score");
-        this.health = ConfigLoader.getInstance().getInt("ball.decorator.multiball.health");
+        this.score = ConfigLoader.getInstance().getInt("brick.decorator.multiball.score");
+        this.health = ConfigLoader.getInstance().getInt("brick.decorator.multiball.health");
+        this.maxHealth = this.health;
     }
 
     @Override
@@ -59,7 +65,11 @@ public class MultiBallBrickDecorator extends BrickDecorator {
 
     @Override
     public void render(GraphicsContext gc) {
-        super.render(gc); // Render del ladrillo base
-        gc.drawImage(TEXTURE, x, y, width, height); // Textura extra decorativa
+        super.render(gc);
+
+        double opacity = Math.max(0.2, (double) health / maxHealth);
+        gc.setGlobalAlpha(opacity);
+        gc.drawImage(TEXTURE, x, y, width, height);
+        gc.setGlobalAlpha(1.0);
     }
 }
