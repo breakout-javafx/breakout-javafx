@@ -172,8 +172,12 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void render() {
-        gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
-
+        if (GameApp.getBackgroundImage() != null) {
+            gc.drawImage(GameApp.getBackgroundImage(), 0, 0, GameApp.WIDTH, GameApp.HEIGHT);
+        } else {
+            gc.clearRect(0, 0, GameApp.WIDTH, GameApp.HEIGHT);
+        }
+    
         if (!gameOver && gameStarted) {
             renderGameElements();
         }
@@ -183,6 +187,7 @@ public class GameLoop extends AnimationTimer {
             renderStartMessage();
         }
     }
+    
 
     public void renderGameOver() {
         gc.setFill(Color.RED);
