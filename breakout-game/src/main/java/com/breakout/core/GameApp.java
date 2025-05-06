@@ -1,6 +1,7 @@
 package com.breakout.core;
 
 import com.breakout.config.ConfigLoader;
+import com.breakout.entities.ball.Ball;
 import com.breakout.level.facade.LevelLoader;
 import com.breakout.manager.GameStateManager;
 import com.breakout.manager.LifeManager;
@@ -20,41 +21,28 @@ public class GameApp extends Application {
 
     public static int WIDTH;
     public static int HEIGHT;
-    private static final String TITLE = ConfigLoader.getInstance().get("game.tittle");
-    GameStateManager gsm = GameStateManager.getInstance();
+    private static final String TITLE = ConfigLoader.getInstance().get("game.title");
+    private static final GameStateManager gsm = GameStateManager.getInstance();
 
     private static Stage primaryStage;
     private static GameLoop currentLoop;
-
-    // ✅ NUEVO: textura de fondo
     private static Image backgroundImage;
 
     @Override
     public void start(Stage stage) {
         primaryStage = stage;
 
-        // Escalar y configurar ventana
         initializeWindow(primaryStage);
-
-        // Crear el contenedor principal (StackPane)
         StackPane root = new StackPane();
-
-        // Crear la escena y asignarla al stage
         Scene scene = new Scene(root, WIDTH, HEIGHT);
+        
         primaryStage.setScene(scene);
-
-        // Cargar textura de fondo desde config
         loadBackgroundTexture();
 
-        // Establezco el LifeManager y el LevelLoader
-        GameStateManager gameStateManager = GameStateManager.getInstance();
-        gameStateManager.setLifeManager(LifeManager.getInstance());
-        gameStateManager.setLevelLoader(new LevelLoader());
+        gsm.setLifeManager(LifeManager.getInstance());
+        gsm.setLevelLoader(new LevelLoader());
 
-        // Configurar los eventos de entrada
         configureInput(scene);
-
-        // Mostrar menú de selección de nivel
         new LevelMenu(primaryStage).show();
     }
 
@@ -81,9 +69,6 @@ public class GameApp extends Application {
         HEIGHT = (int) (baseHeight * scale);
     }
 
-    /**
-     * Método llamado desde LevelMenu al seleccionar un nivel.
-     */
     public static void startGame(String levelPath) {
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -97,7 +82,6 @@ public class GameApp extends Application {
         primaryStage.show();
 
         configureInput(scene);
-
         currentLoop.start();
         currentLoop.startGame();
     }
@@ -111,8 +95,6 @@ public class GameApp extends Application {
         scene.getRoot().requestFocus();
 
         scene.setOnKeyPressed(e -> {
-            GameStateManager gsm = GameStateManager.getInstance();
-
             if (e.getCode() == KeyCode.LEFT) {
                 currentLoop.setLeftPressed(true);
             }
@@ -148,18 +130,17 @@ public class GameApp extends Application {
         try {
             var url = getClass().getClassLoader().getResource(path);
             if (url == null) {
-                System.err.println("❌ No se encontró el recurso de fondo en el JAR: " + path);
+                System.err.println("No se encontró el recurso de fondo en el JAR: " + path);
                 return;
             }
             backgroundImage = new Image(url.toExternalForm());
             System.out.println("✅ Fondo cargado correctamente.");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("❌ Error cargando la imagen de fondo.");
+            System.err.println("Error cargando la imagen de fondo.");
         }
     }
 
-    // ✅ NUEVO: getter para acceder desde GameLoop
     public static Image getBackgroundImage() {
         return backgroundImage;
     }
