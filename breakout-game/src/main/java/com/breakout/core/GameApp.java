@@ -21,40 +21,28 @@ public class GameApp extends Application {
 
     public static int WIDTH;
     public static int HEIGHT;
-    private static final String TITLE = ConfigLoader.getInstance().get("game.tittle");
-    private GameStateManager gsm = GameStateManager.getInstance();
+    private static final String TITLE = ConfigLoader.getInstance().get("game.title");
+    private static final GameStateManager gsm = GameStateManager.getInstance();
 
     private static Stage primaryStage;
     private static GameLoop currentLoop;
-
-    // Textura de fondo
     private static Image backgroundImage;
 
     @Override
     public void start(Stage stage) {
         primaryStage = stage;
 
-        // Escalar y configurar ventana
         initializeWindow(primaryStage);
-
-        // Cargar textura de fondo desde config
+        StackPane root = new StackPane();
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
+        
+        primaryStage.setScene(scene);
         loadBackgroundTexture();
 
-        // Establecer LifeManager y LevelLoader
         gsm.setLifeManager(LifeManager.getInstance());
         gsm.setLevelLoader(new LevelLoader());
 
-        // Crear el contenedor principal (StackPane)
-        StackPane root = new StackPane();
-        
-        // Crear la escena y asignarla al stage
-        Scene scene = new Scene(root, WIDTH, HEIGHT);
-        primaryStage.setScene(scene);
-
-        // Configurar los eventos de entrada
         configureInput(scene);
-
-        // Mostrar menú de selección de nivel
         new LevelMenu(primaryStage).show();
     }
 
@@ -81,9 +69,6 @@ public class GameApp extends Application {
         HEIGHT = (int) (baseHeight * scale);
     }
 
-    /**
-     * Método llamado desde LevelMenu al seleccionar un nivel.
-     */
     public static void startGame(String levelPath) {
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -97,12 +82,15 @@ public class GameApp extends Application {
         primaryStage.show();
 
         configureInput(scene);
-
         currentLoop.start();
         currentLoop.startGame();
     }
 
     private static void configureInput(Scene scene) {
+        if (scene == null) {
+            throw new IllegalArgumentException("La escena no puede ser null");
+        }
+
         scene.getRoot().setFocusTraversable(true);
         scene.getRoot().requestFocus();
 
@@ -115,11 +103,11 @@ public class GameApp extends Application {
             }
 
             if (e.getCode() == KeyCode.SPACE) {
-                if (GameStateManager.getInstance().isGameOver()) {
-                    GameStateManager.getInstance().restartGame();
+                if (gsm.isGameOver()) {
+                    gsm.restartGame();
                     currentLoop.resetGame();
                 } else {
-                    GameStateManager.getInstance().startGame();
+                    gsm.startGame();
                     currentLoop.startGame();
                 }
             }
@@ -137,7 +125,7 @@ public class GameApp extends Application {
 
     private void loadBackgroundTexture() {
         String path = ConfigLoader.getInstance().get("background.texture");
-        System.out.println("Cargando fondo desde: " + path);
+        System.out.println("🧩 Cargando fondo desde: " + path);
 
         try {
             var url = getClass().getClassLoader().getResource(path);
@@ -146,16 +134,14 @@ public class GameApp extends Application {
                 return;
             }
             backgroundImage = new Image(url.toExternalForm());
-            System.out.println("Fondo cargado correctamente.");
+            System.out.println("✅ Fondo cargado correctamente.");
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Error cargando la imagen de fondo.");
         }
     }
 
-    // Getter para acceder a la imagen de fondo desde GameLoop
     public static Image getBackgroundImage() {
         return backgroundImage;
     }
 }
-

@@ -36,6 +36,8 @@ public class GameLoop extends AnimationTimer {
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
+    private boolean gameStarted = false;
+    private boolean gameOver = false;
 
     private long lastUpdateTime = 0;
     private int totalScore = 0;
@@ -87,7 +89,7 @@ public class GameLoop extends AnimationTimer {
     private void updateBalls() {
         int activeBallsBefore = countActiveBalls();
     
-        // Eliminar bolas inactivas (versión compatible)
+        // Eliminar bolas inactivas
         Iterator<Ball> iterator = balls.iterator();
         int ballsRemoved = 0;
         while (iterator.hasNext()) {
@@ -141,49 +143,68 @@ public class GameLoop extends AnimationTimer {
 
     private void handleCollisions() {
         bricksRecentlyHit.clear();
-
+    
         for (Ball ball : balls) {
             double startX = ball.getPrevX(), startY = ball.getPrevY();
             double endX = ball.getX(), endY = ball.getY();
             double dx = endX - startX, dy = endY - startY;
             double radius = ball.getRadius();
-
+    
             Iterator<AbstractBrick> iterator = bricks.iterator();
+            AbstractBrick earliestBrick = null;
+            double earliestEntryTime = Double.POSITIVE_INFINITY;
+            boolean horizontal = false;
+    
             while (iterator.hasNext()) {
                 AbstractBrick brick = iterator.next();
-
+    
                 if (bricksRecentlyHit.contains(brick)) continue;
-
-                double bx = brick.getX() - radius;
-                double by = brick.getY() - radius;
-                double bw = brick.getWidth() + 2 * radius;
-                double bh = brick.getHeight() + 2 * radius;
-
-                double tEntryX = dx == 0 ? Double.NEGATIVE_INFINITY : (dx > 0 ? bx - startX : bx + bw - startX) / dx;
-                double tExitX = dx == 0 ? Double.POSITIVE_INFINITY : (dx > 0 ? bx + bw - startX : bx - startX) / dx;
-
-                double tEntryY = dy == 0 ? Double.NEGATIVE_INFINITY : (dy > 0 ? by - startY : by + bh - startY) / dy;
-                double tExitY = dy == 0 ? Double.POSITIVE_INFINITY : (dy > 0 ? by + bh - startY : by - startY) / dy;
-
+    
+                double bx = brick.getX();
+                double by = brick.getY();
+                double bw = brick.getWidth();
+                double bh = brick.getHeight();
+    
+                double tEntryX = (dx == 0) ? Double.NEGATIVE_INFINITY : (dx > 0 ? bx - (startX + radius) : bx + bw - (startX - radius)) / dx;
+                double tExitX = (dx == 0) ? Double.POSITIVE_INFINITY : (dx > 0 ? bx + bw - (startX + radius) : bx - (startX - radius)) / dx;
+    
+                double tEntryY = (dy == 0) ? Double.NEGATIVE_INFINITY : (dy > 0 ? by - (startY + radius) : by + bh - (startY - radius)) / dy;
+                double tExitY = (dy == 0) ? Double.POSITIVE_INFINITY : (dy > 0 ? by + bh - (startY + radius) : by - (startY - radius)) / dy;
+    
                 double entryTime = Math.max(tEntryX, tEntryY);
                 double exitTime = Math.min(tExitX, tExitY);
-
+    
                 if (entryTime < exitTime && entryTime >= 0 && entryTime <= 1) {
-                    if (tEntryX > tEntryY) {
-                        ball.setDx(-ball.getDx());
-                    } else {
-                        ball.setDy(-ball.getDy());
+                    if (entryTime < earliestEntryTime) {
+                        earliestEntryTime = entryTime;
+    
+                        // Mejora esquinas
+                        if (Math.abs(tEntryX - tEntryY) < 0.15) {
+                            horizontal = Math.abs(dx) > Math.abs(dy);
+                        } else {
+                            horizontal = tEntryX > tEntryY;
+                        }
+    
+                        earliestBrick = brick;
                     }
-
-                    brick.hit();
-                    bricksRecentlyHit.add(brick);
-
-                    if (brick.isDestroyed()) {
-                        addScore(brick.getScore());
-                        iterator.remove();
-                    }
-
-                    break;
+                }
+            }
+    
+            if (earliestBrick != null) {
+                if (horizontal) {
+                    ball.setX(startX + dx * earliestEntryTime + (dx > 0 ? 0.01 : -0.01));
+                    ball.setDx(-ball.getDx());
+                } else {
+                    ball.setY(startY + dy * earliestEntryTime + (dy > 0 ? 0.01 : -0.01));
+                    ball.setDy(-ball.getDy());
+                }
+    
+                earliestBrick.hit();
+                bricksRecentlyHit.add(earliestBrick);
+    
+                if (earliestBrick.isDestroyed()) {
+                    addScore(earliestBrick.getScore());
+                    bricks.remove(earliestBrick);
                 }
             }
         }
