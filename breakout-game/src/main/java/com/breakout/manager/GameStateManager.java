@@ -1,5 +1,6 @@
 package com.breakout.manager;
 
+import com.breakout.config.ConfigLoader;
 import com.breakout.core.GameLoop;
 import com.breakout.entities.ball.Ball;
 import com.breakout.entities.ball.BallSpawner;
@@ -8,6 +9,8 @@ import com.breakout.level.facade.LevelLoader;
 import com.breakout.manager.LifeManager;
 import com.breakout.entities.paddle.Paddle;
 import com.breakout.manager.datapool.GameDataPool;
+
+import javafx.scene.canvas.Canvas;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,7 @@ public class GameStateManager {
     private int score = 0;
     private boolean processingLifeLoss = false; // Nueva variable de estado
     private boolean processingBallLoss = false;
+    private boolean respawnInProgress = false;
 
     private GameStateManager() {}
 
@@ -80,24 +84,25 @@ public class GameStateManager {
         gameStarted = false;
         gameOver = false;
         balls.clear();
+
         GameDataPool.getInstance().setScore(0);
         GameDataPool.getInstance().setGameStarted(false);
         GameDataPool.getInstance().setGameOver(false);
 
         LifeManager.getInstance().reset();
 
+        paddle.resetPosition();
+
         bricks = levelLoader.loadLevel("levels/level1.json", gameLoop, ballSpawner);
         GameDataPool.getInstance().setBricks(bricks);
 
+        // Usamos el paddle directamente desde la clase, no del GameLoop ni del DataPool
         Ball ball = ballSpawner.spawnBall(
-            gameLoop.getPaddle().getX() + gameLoop.getPaddle().getWidth() / 2,
-            gameLoop.getPaddle().getY() - Ball.RADIUS
+            paddle.getX() + paddle.getWidth() / 2,
+            paddle.getY() - Ball.RADIUS
         );
 
-        gameLoop.addBall(ball);
-        GameDataPool.getInstance().addBall(ball);
-
-        gameLoop.getPaddle().resetPosition();
+        addBall(ball); // esto también actualiza GameDataPool
     }
 
     public void addScore(int points) {
@@ -109,40 +114,30 @@ public class GameStateManager {
     public void loseLife() {
         if (gameOver) return;
 
-        System.out.println("[GSM] Procesando eliminación de vida");
-    
+        System.out.println("[GSM] Procesando eliminacion de vida");
+
         LifeManager.getInstance().decreaseLife();
 
         if (LifeManager.getInstance().getLives() <= 0) {
             gameOver();
         } else {
             // Solo spawnear nueva bola si no hay bolas activas
-            if (gameLoop != null && gameLoop.getActiveBallCount() == 0) {
+            if (balls.isEmpty()) {
                 spawnNewBall();
             }
         }
     }
 
     private void spawnNewBall() {
-        if (gameLoop == null || gameOver) return;
-    
-        try {
-            // Pequeña pausa para dar feedback visual
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    
+        double radius = ConfigLoader.getInstance().getDouble("ball.radius");
         Ball newBall = ballSpawner.spawnBall(
-            gameLoop.getPaddle().getX() + gameLoop.getPaddle().getWidth() / 2,
-            gameLoop.getPaddle().getY() - Ball.RADIUS
+            paddle.getX() + paddle.getWidth() / 2 - radius,
+            paddle.getY() - 1.5 * radius
         );
+        newBall.setDy(Math.abs(newBall.getDy())); // Asegurar movimiento hacia arriba
     
-        // Resetear velocidad para asegurar movimiento hacia arriba
-        newBall.setDy(Math.abs(newBall.getDy()));
-        gameLoop.addBall(newBall);
-    
-        System.out.println("[GSM] Nueva bola creada en (" + newBall.getX() + "," + newBall.getY() + ")");
+        gameLoop.getBalls().add(newBall);
+        System.out.println("[BOLA] Nueva creada en (" + newBall.getX() + "," + newBall.getY() + ")");
     }
 
     public void gameOver() {
@@ -180,24 +175,61 @@ public class GameStateManager {
     }
 
     public void notifyBallLost () {
-        if (gameOver) {
-            System.out.println("[JUEGO] Ignorando pérdida de bola - Juego ya terminado");
-            return;
+        if (gameOver) return;
+    
+        LifeManager.getInstance().decreaseLife();
+        System.out.println("[VIDAS] Vida restada. Restantes: " + 
+                      LifeManager.getInstance().getLives());
+    
+        if (LifeManager.getInstance().getLives() <= 0) {
+            gameOver();
+        }
+    }
+
+    public void spawnNewBallIfNeeded() {
+        if (gameOver || gameLoop == null) return;
+        
+        System.out.println("[GSM] Preparando nueva bola...");
+        
+        try {
+            // Pequeña pausa para feedback visual
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         
-        System.out.println("[JUEGO] Procesando pérdida de última bola");
+        // Llama al nuevo método de GameLoop
+        gameLoop.addNewBall();
+    }
+
+    public boolean shouldSpawnNewBall() {
+        return !gameOver && 
+               LifeManager.getInstance().getLives() > 0 &&
+               gameLoop != null &&
+               paddle != null;
+    }
+
+    public void notifyLastBallLost() {
+        if (gameOver) return;
+        
+        System.out.println("[GSM] Procesando pérdida de última bola");
         LifeManager.getInstance().decreaseLife();
         
         if (LifeManager.getInstance().getLives() <= 0) {
             gameOver();
         } else {
-            // Pequeña pausa para feedback visual
+            // Pausa antes del respawn
             try {
-                Thread.sleep(500);
+                Thread.sleep(500); // Medio segundo de espera
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            spawnNewBall();
+            
+            // Spawn de nueva bola
+            if (gameLoop != null) {
+                System.out.println("[GSM] Spawneando nueva bola");
+                spawnNewBall();
+            }
         }
     }
 }

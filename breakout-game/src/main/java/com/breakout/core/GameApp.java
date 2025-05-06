@@ -1,6 +1,7 @@
 package com.breakout.core;
 
 import com.breakout.config.ConfigLoader;
+import com.breakout.entities.ball.Ball;
 import com.breakout.level.facade.LevelLoader;
 import com.breakout.manager.GameStateManager;
 import com.breakout.manager.LifeManager;
@@ -21,12 +22,12 @@ public class GameApp extends Application {
     public static int WIDTH;
     public static int HEIGHT;
     private static final String TITLE = ConfigLoader.getInstance().get("game.tittle");
-    GameStateManager gsm = GameStateManager.getInstance();
+    private GameStateManager gsm = GameStateManager.getInstance();
 
     private static Stage primaryStage;
     private static GameLoop currentLoop;
 
-    // ✅ NUEVO: textura de fondo
+    // Textura de fondo
     private static Image backgroundImage;
 
     @Override
@@ -36,20 +37,19 @@ public class GameApp extends Application {
         // Escalar y configurar ventana
         initializeWindow(primaryStage);
 
-        // Crear el contenedor principal (StackPane)
-        StackPane root = new StackPane();
-
-        // Crear la escena y asignarla al stage
-        Scene scene = new Scene(root, WIDTH, HEIGHT);
-        primaryStage.setScene(scene);
-
         // Cargar textura de fondo desde config
         loadBackgroundTexture();
 
-        // Establezco el LifeManager y el LevelLoader
-        GameStateManager gameStateManager = GameStateManager.getInstance();
-        gameStateManager.setLifeManager(LifeManager.getInstance());
-        gameStateManager.setLevelLoader(new LevelLoader());
+        // Establecer LifeManager y LevelLoader
+        gsm.setLifeManager(LifeManager.getInstance());
+        gsm.setLevelLoader(new LevelLoader());
+
+        // Crear el contenedor principal (StackPane)
+        StackPane root = new StackPane();
+        
+        // Crear la escena y asignarla al stage
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
+        primaryStage.setScene(scene);
 
         // Configurar los eventos de entrada
         configureInput(scene);
@@ -103,16 +103,10 @@ public class GameApp extends Application {
     }
 
     private static void configureInput(Scene scene) {
-        if (scene == null) {
-            throw new IllegalArgumentException("La escena no puede ser null");
-        }
-
         scene.getRoot().setFocusTraversable(true);
         scene.getRoot().requestFocus();
 
         scene.setOnKeyPressed(e -> {
-            GameStateManager gsm = GameStateManager.getInstance();
-
             if (e.getCode() == KeyCode.LEFT) {
                 currentLoop.setLeftPressed(true);
             }
@@ -121,11 +115,11 @@ public class GameApp extends Application {
             }
 
             if (e.getCode() == KeyCode.SPACE) {
-                if (gsm.isGameOver()) {
-                    gsm.restartGame();
+                if (GameStateManager.getInstance().isGameOver()) {
+                    GameStateManager.getInstance().restartGame();
                     currentLoop.resetGame();
                 } else {
-                    gsm.startGame();
+                    GameStateManager.getInstance().startGame();
                     currentLoop.startGame();
                 }
             }
@@ -143,24 +137,25 @@ public class GameApp extends Application {
 
     private void loadBackgroundTexture() {
         String path = ConfigLoader.getInstance().get("background.texture");
-        System.out.println("🧩 Cargando fondo desde: " + path);
+        System.out.println("Cargando fondo desde: " + path);
 
         try {
             var url = getClass().getClassLoader().getResource(path);
             if (url == null) {
-                System.err.println("❌ No se encontró el recurso de fondo en el JAR: " + path);
+                System.err.println("No se encontró el recurso de fondo en el JAR: " + path);
                 return;
             }
             backgroundImage = new Image(url.toExternalForm());
-            System.out.println("✅ Fondo cargado correctamente.");
+            System.out.println("Fondo cargado correctamente.");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("❌ Error cargando la imagen de fondo.");
+            System.err.println("Error cargando la imagen de fondo.");
         }
     }
 
-    // ✅ NUEVO: getter para acceder desde GameLoop
+    // Getter para acceder a la imagen de fondo desde GameLoop
     public static Image getBackgroundImage() {
         return backgroundImage;
     }
 }
+

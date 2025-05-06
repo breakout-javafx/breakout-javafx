@@ -7,7 +7,8 @@ import com.breakout.manager.LifeManager;
 public class BottomWall implements CollisionStrategy {
     @Override
     public void onCollision(Ball ball) {
-        System.out.println("[DEBUG] Colisión con fondo - Bola marcada como inactiva");
-        ball.setActive(false); // Marco para eliminación
+        // Solo marcamos la bola como inactiva
+        ball.setActive(false);
+        System.out.println("[COLISIÓN] Bola marcada como inactiva por BottomWall");
     }
 }

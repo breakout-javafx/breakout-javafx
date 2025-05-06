@@ -5,6 +5,8 @@ import com.breakout.core.GameLoop;
 import com.breakout.entities.ball.Ball;
 import com.breakout.entities.ball.BallSpawner;
 import com.breakout.entities.brick.AbstractBrick;
+import com.breakout.manager.GameStateManager;
+
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -65,7 +67,9 @@ public class MultiBallBrickDecorator extends BrickDecorator {
             Ball newBall = ballSpawner.spawnBall(x + width / 2, y);
             newBall.setDx(rand.nextBoolean() ? speed : -speed);
             newBall.setDy(speed);
-            gameLoop.addBall(newBall);
+        
+            // Agregar la nueva bola al GameStateManager
+            GameStateManager.getInstance().addBall(newBall);
         }
     }
 
