@@ -1,0 +1,68 @@
+{
+  "compressionlevel": -1,
+  "height": 15,
+  "infinite": false,
+  "layers": [
+    {
+      "data": [
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,
+        0,0,5,9,9,9,9,9,9,9,9,9,9,9,9,9,9,5,0,0,
+        0,0,5,9,9,9,9,9,9,9,9,9,9,9,9,9,9,5,0,0,
+        0,0,5,9,9,9,9,9,9,9,9,9,9,9,9,9,9,5,0,0,
+        0,0,5,9,9,9,9,0,0,0,0,0,9,9,9,9,9,5,0,0,
+        0,0,5,9,9,9,9,9,9,0,9,9,9,9,9,9,9,5,0,0,
+        0,0,5,9,9,9,9,9,9,0,9,9,9,9,9,9,9,5,0,0,
+        0,0,5,9,9,9,9,9,9,0,9,9,9,9,9,9,9,5,0,0,
+        0,0,5,9,9,9,9,9,9,0,9,9,9,9,9,9,9,5,0,0,
+        0,0,5,9,9,9,9,9,9,0,9,9,9,9,9,9,9,5,0,0,
+        0,0,5,5,5,5,5,0,0,0,0,0,5,5,5,5,5,5,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      ],
+      "height": 15,
+      "id": 1,
+      "name": "Cubo Glowing con Núcleo Multiball",
+      "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 20,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "nextlayerid": 2,
+  "nextobjectid": 1,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.11.2",
+  "tileheight": 32,
+  "tilesets": [
+    {
+      "columns": 2,
+      "firstgid": 1,
+      "image": "../Downloads/64x/64x/Bricks.png",
+      "imageheight": 64,
+      "imagewidth": 64,
+      "margin": 0,
+      "name": "tileset",
+      "spacing": 0,
+      "tilecount": 4,
+      "tileheight": 32,
+      "tilewidth": 32
+    },
+    {
+      "firstgid": 5,
+      "source": "tileset.tsx"
+    },
+    {
+      "firstgid": 9,
+      "source": "tilesetmultiball.tsx"
+    }
+  ],
+  "tilewidth": 32,
+  "type": "map",
+  "version": "1.10",
+  "width": 20
+}

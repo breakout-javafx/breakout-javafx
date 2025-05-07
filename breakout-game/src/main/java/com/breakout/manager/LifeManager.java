@@ -22,11 +22,12 @@ public class LifeManager {
     public void decreaseLife() {
         if (lives > 0) {
             lives--;
-            System.out.println("Vida perdida. Vidas restantes: " + lives);
-        }
-
-        if (lives == 0) {
-            onLivesDepleted();
+            System.out.println("[LifeManager] Vida restada. Vidas: " + lives);
+            
+            if (lives <= 0) {
+                System.out.println("[LifeManager] Notificando Game Over");
+                GameStateManager.getInstance().gameOver(); // Notificación directa
+            }
         }
     }
 

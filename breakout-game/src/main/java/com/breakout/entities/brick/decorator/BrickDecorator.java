@@ -19,12 +19,12 @@ public abstract class BrickDecorator extends AbstractBrick {
 
     @Override
     public void hit() {
-        decoratedBrick.hit();
+        this.health--;
     }
 
     @Override
     public boolean isDestroyed() {
-        return decoratedBrick.isDestroyed();
+        return this.health <= 0;
     }
 
     @Override

@@ -2,77 +2,80 @@ package com.breakout.entities.ball;
 
 import com.breakout.config.ConfigLoader;
 import com.breakout.entities.ball.strategy.BallMovementStrategy;
-import com.breakout.entities.ball.strategy.NormalMovementStrategy;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 public class Ball {
-    private double x, y;
-    private double dx, dy;
-    private final double radius = 10;
-    private boolean active = true;
+    public static final double RADIUS = 10;
 
-    private BallMovementStrategy movementStrategy;  // Agregamos el strategy
+    private double x, y, dx, dy;  // Posición actual y velocidad de los ejes x e y
+    private double prevX, prevY;  // Posición anterior (para realizar colisiones, por ejemplo)
+    private final double radius = ConfigLoader.getInstance().getDouble("ball.radius");
+    private boolean active = true;  // Estado de la bola (activa/inactiva)
 
+    private Image texture;  // Textura para la bola
+    private BallMovementStrategy movementStrategy;  // Estrategia de movimiento
+
+    // Constructor para crear una bola con la posición inicial
     public Ball(double startX, double startY) {
         this.x = startX;
         this.y = startY;
-
-        this.dx = ConfigLoader.getInstance().getDouble("ball.speed");
-        this.dy = this.dx;  // Usar la misma velocidad para el eje Y
-
-        this.movementStrategy = new NormalMovementStrategy();  // Valor por defecto
+        this.dx = ConfigLoader.getInstance().getDouble("ball.speed"); // Obtener la velocidad desde la configuración
+        this.dy = this.dx;  // Usar la misma velocidad en X y Y por defecto
     }
 
+    // Establecer la textura de la bola
+    public void setTexture(Image texture) {
+        this.texture = texture;
+    }
+
+    // Actualizar la posición de la bola
     public void update() {
-        movementStrategy.move(this);  // Delegar el movimiento al strategy
-    }
+        prevX = x;
+        prevY = y;
 
-    public void render(GraphicsContext gc) {
-        gc.setFill(Color.RED);
-        gc.fillOval(x, y, radius, radius);
-    }
-
-    public double getX() { return x; }
-    public void setX(double x) { this.x = x; }
-
-    public double getY() { return y; }
-    public void setY(double y) { this.y = y; }
-
-    public double getDx() { return dx; }
-    public void setDx(double dx) { this.dx = dx; }
-
-    public double getDy() { return dy; }
-    public void setDy(double dy) { this.dy = dy; }
-
-    public double getRadius() { return radius; }
-
-    public void invertY() {
-        dy *= -1;
-    }
-
-    public void setMovementStrategy(BallMovementStrategy strategy) {
-        this.movementStrategy = strategy;
-    }
-
-    // Método para obtener los límites de la pelota, útil para la detección de colisiones
-    public Rectangle2D getBounds() {
-        return new Rectangle2D(x - radius, y - radius, 2 * radius, 2 * radius);
-    }
-
-    // Nuevos Métodos
-    public boolean isActive () {
-        return active;
-    }
-
-    public void setActive (boolean active) {
-        this.active = active;
-
-        if (!active) {
-            // Efecto visual al desaparecer
-            this.dx = 0;
-            this.dy = 0;
+        // Aplica movimiento según la estrategia
+        if (movementStrategy != null) {
+            movementStrategy.move(this);
+        } else {
+            // Movimiento básico
+            x += dx;
+            y += dy;
         }
     }
+
+    // Renderizar la bola en el canvas
+    public void render(GraphicsContext gc) {
+        if (texture != null) {
+            gc.drawImage(texture, x, y, radius * 2, radius * 2);  // Dibujar la imagen de la bola
+        } else {
+            gc.setFill(Color.RED);  // Si no tiene textura, usar color rojo
+            gc.fillOval(x, y, radius * 2, radius * 2);  // Dibujar un círculo
+        }
+    }
+
+    // Setters para manipular las propiedades de la bola
+    public void setX(double x) { this.x = x; }
+    public void setY(double y) { this.y = y; }
+    public void setDx(double dx) { this.dx = dx; }
+    public void setDy(double dy) { this.dy = dy; }
+    public void setActive(boolean active) { this.active = active; }
+    public void setMovementStrategy(BallMovementStrategy strategy) { this.movementStrategy = strategy; }
+
+    // Getters para obtener las propiedades de la bola
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public double getPrevX() { return prevX; }
+    public double getPrevY() { return prevY; }
+    public double getDx() { return dx; }
+    public double getDy() { return dy; }
+    public double getRadius() { return radius; }
+    public boolean isActive() { return active; }
+
+    // Devuelve las dimensiones de la bola para la detección de colisiones
+    public javafx.geometry.Bounds getBounds() {
+        return new javafx.geometry.BoundingBox(x, y, radius * 2, radius * 2);
+    }
 }
+
