@@ -73,6 +73,10 @@ public class GameLoop extends AnimationTimer {
     public void handle(long now) {
         if (now - lastUpdateTime >= NANOS_PER_UPDATE) {
             update();
+            // Comprueba si no hay bolas activas y quedan vidas para añadir una nueva
+            if (balls.isEmpty() && LifeManager.getInstance().getLives() > 0 && GameStateManager.getInstance().isGameStarted() && !GameStateManager.getInstance().isGameOver()) {
+                addNewBall();
+            }
             lastUpdateTime = now;
         }
         render();
@@ -85,26 +89,24 @@ public class GameLoop extends AnimationTimer {
         updateBalls();
         updatePaddle();
         handleCollisions();
+
+        // La lógica de perder vida se mueve aquí, después de actualizar todas las bolas
+        if (balls.isEmpty() && gsm.isGameStarted() && !gsm.isGameOver()) {
+            gsm.loseLife();
+        }
     }
 
     private void updateBalls() {
-        int ballsLost = 0;
-    
         Iterator<Ball> iterator = balls.iterator();
         while (iterator.hasNext()) {
             Ball ball = iterator.next();
             ball.update();
-        
+
             if (!ball.isActive()) {
                 iterator.remove();
-                ballsLost++; // Contabiliza bolas perdidas
             }
         }
-    
-        // Notifica solo una vez por bola perdida
-        if (ballsLost > 0) {
-            GameStateManager.getInstance().loseLife();
-        }
+        // Ya no notificamos la pérdida de vida aquí. Se hace en el método update().
     }
 
     private void updatePaddle() {
@@ -114,7 +116,7 @@ public class GameLoop extends AnimationTimer {
 
     private void handleCollisions() {
         bricksRecentlyHit.clear();
-    
+
         for (Ball ball : new ArrayList<>(balls)) {
             if (ball.getBounds().intersects(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight())) {
                 new PaddleCollisionStrategy().onCollision(ball, paddle);
@@ -124,47 +126,47 @@ public class GameLoop extends AnimationTimer {
             double endX = ball.getX(), endY = ball.getY();
             double dx = endX - startX, dy = endY - startY;
             double radius = ball.getRadius();
-    
+
             Iterator<AbstractBrick> iterator = bricks.iterator();
             AbstractBrick earliestBrick = null;
             double earliestEntryTime = Double.POSITIVE_INFINITY;
             boolean horizontal = false;
-    
+
             while (iterator.hasNext()) {
                 AbstractBrick brick = iterator.next();
-    
+
                 if (bricksRecentlyHit.contains(brick)) continue;
-    
+
                 double bx = brick.getX();
                 double by = brick.getY();
                 double bw = brick.getWidth();
                 double bh = brick.getHeight();
-    
+
                 double tEntryX = (dx == 0) ? Double.NEGATIVE_INFINITY : (dx > 0 ? bx - (startX + radius) : bx + bw - (startX - radius)) / dx;
                 double tExitX = (dx == 0) ? Double.POSITIVE_INFINITY : (dx > 0 ? bx + bw - (startX + radius) : bx - (startX - radius)) / dx;
-    
+
                 double tEntryY = (dy == 0) ? Double.NEGATIVE_INFINITY : (dy > 0 ? by - (startY + radius) : by + bh - (startY - radius)) / dy;
                 double tExitY = (dy == 0) ? Double.POSITIVE_INFINITY : (dy > 0 ? by + bh - (startY + radius) : by - (startY - radius)) / dy;
-    
+
                 double entryTime = Math.max(tEntryX, tEntryY);
                 double exitTime = Math.min(tExitX, tExitY);
-    
+
                 if (entryTime < exitTime && entryTime >= 0 && entryTime <= 1) {
                     if (entryTime < earliestEntryTime) {
                         earliestEntryTime = entryTime;
-    
+
                         // Mejora esquinas
                         if (Math.abs(tEntryX - tEntryY) < 0.15) {
                             horizontal = Math.abs(dx) > Math.abs(dy);
                         } else {
                             horizontal = tEntryX > tEntryY;
                         }
-    
+
                         earliestBrick = brick;
                     }
                 }
             }
-    
+
             if (earliestBrick != null) {
                 if (horizontal) {
                     ball.setX(startX + dx * earliestEntryTime + (dx > 0 ? 0.01 : -0.01));
@@ -173,10 +175,10 @@ public class GameLoop extends AnimationTimer {
                     ball.setY(startY + dy * earliestEntryTime + (dy > 0 ? 0.01 : -0.01));
                     ball.setDy(-ball.getDy());
                 }
-    
+
                 earliestBrick.hit();
                 bricksRecentlyHit.add(earliestBrick);
-    
+
                 if (earliestBrick.isDestroyed()) {
                     addScore(earliestBrick.getScore());
                     bricks.remove(earliestBrick);
@@ -256,8 +258,9 @@ public class GameLoop extends AnimationTimer {
         gc.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + size / 4);
         gc.bezierCurveTo(x - size / 2, y + size / 2, x, y + size, x, y + size * 1.25);
         gc.bezierCurveTo(x, y + size, x + size / 2, y + size / 2, x + size / 2, y + size / 4);
-        gc.closePath();
+        gc.bezierCurveTo(x + size / 2, y, x, y, x, y + size / 4);
         gc.fill();
+        gc.closePath();
     }
 
     private void addScore(int points) {
@@ -292,29 +295,15 @@ public class GameLoop extends AnimationTimer {
     public void addNewBall() {
         double radius = ConfigLoader.getInstance().getDouble("ball.radius");
         Ball newBall = ballSpawner.spawnBall(
-            paddle.getX() + paddle.getWidth() / 2.0 - radius,
-            paddle.getY() - 1.5 * radius
+                paddle.getX() + paddle.getWidth() / 2.0 - radius,
+                paddle.getY() - 1.5 * radius
         );
         newBall.setDy(Math.abs(newBall.getDy()));
         balls.add(newBall);
         System.out.println("[JUEGO] Nueva bola añadida. Total: " + balls.size());
     }
 
-    private boolean shouldSpawnNewBall() {
-        return !GameStateManager.getInstance().isGameOver() && 
-               LifeManager.getInstance().getLives() > 0;
-    }
-
     public List<Ball> getBalls() {
         return balls;
-    }
-
-    // Método auxiliar para contar bolas activas
-    private int countActiveBalls() {
-        int count = 0;
-        for (Ball ball : balls) {
-            if (ball.isActive()) count++;
-        }
-        return count;
     }
 }
