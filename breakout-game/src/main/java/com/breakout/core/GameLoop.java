@@ -262,9 +262,11 @@ public class GameLoop extends AnimationTimer {
         gc.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + size / 4);
         gc.bezierCurveTo(x - size / 2, y + size / 2, x, y + size, x, y + size * 1.25);
         gc.bezierCurveTo(x, y + size, x + size / 2, y + size / 2, x + size / 2, y + size / 4);
-        gc.closePath();
+        gc.bezierCurveTo(x + size / 2, y, x, y, x, y + size / 4);
         gc.fill();
+        gc.closePath();
     }
+
 
     private void addScore(int points) {
         totalScore += points;
