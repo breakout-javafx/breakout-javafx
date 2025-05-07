@@ -64,9 +64,9 @@
   *Añadir la lógica de generación de múltiples pelotas y la integración con el patrón Decorator para modificar su comportamiento.*  
   **Done by:** _[Javi]_  
 
-- [ ] **Gestionar la lógica de eliminación y finalización de la partida**  
+- [x] **Gestionar la lógica de eliminación y finalización de la partida**  
   *Encargarse de que se use el setting de radio de bola al generar la bola. Implementar la lógica de eliminación de bolas al tocar la base de la pantalla y finalizar la partida si nos quedamos sin bolas.*
-  **Done by:** _[Nombre del responsable]_  
+  **Done by:** _[Marta]_  
 
 - [ ] **Ajuste tamaño ventan juego**  
   *Implementar el ajuste del tamaño de la ventana de juego (no ventana total) desde el .properties.*  

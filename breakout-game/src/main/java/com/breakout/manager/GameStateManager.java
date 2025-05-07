@@ -80,29 +80,20 @@ public class GameStateManager {
     }
 
     public void restartGame() {
-        score = 0;
-        gameStarted = false;
-        gameOver = false;
-        balls.clear();
-
-        GameDataPool.getInstance().setScore(0);
-        GameDataPool.getInstance().setGameStarted(false);
-        GameDataPool.getInstance().setGameOver(false);
-
-        LifeManager.getInstance().reset();
-
-        paddle.resetPosition();
-
-        bricks = levelLoader.loadLevel("levels/level1.json", gameLoop, ballSpawner);
-        GameDataPool.getInstance().setBricks(bricks);
-
-        // Usamos el paddle directamente desde la clase, no del GameLoop ni del DataPool
-        Ball ball = ballSpawner.spawnBall(
-            paddle.getX() + paddle.getWidth() / 2,
-            paddle.getY() - Ball.RADIUS
-        );
-
-        addBall(ball); // esto también actualiza GameDataPool
+        this.gameStarted = false;
+        this.gameOver = false;
+        this.score = 0;
+        this.balls.clear();
+    
+        if (this.lifeManager != null) {
+            this.lifeManager.reset();
+        }
+    
+        if (this.paddle != null) {
+            this.paddle.resetPosition();
+        }
+    
+        System.out.println("[DEBUG] Juego reiniciado. Estado gameOver: " + this.gameOver);
     }
 
     public void addScore(int points) {
