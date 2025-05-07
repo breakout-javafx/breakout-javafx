@@ -5,11 +5,8 @@ import com.breakout.entities.ball.Ball;
 import com.breakout.entities.ball.BallSpawner;
 import com.breakout.entities.ball.strategy.PaddleCollisionStrategy;
 import com.breakout.entities.brick.AbstractBrick;
+import com.breakout.entities.brick.decorator.MultiBallBrickDecorator;
 import com.breakout.entities.paddle.Paddle;
-import com.breakout.entities.wall.BottomWall;
-import com.breakout.entities.wall.LeftWall;
-import com.breakout.entities.wall.RightWall;
-import com.breakout.entities.wall.TopWall;
 import com.breakout.level.facade.LevelLoader;
 import com.breakout.manager.GameStateManager;
 import com.breakout.manager.LifeManager;
@@ -21,6 +18,7 @@ import javafx.scene.text.Font;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 public class GameLoop extends AnimationTimer {
 
@@ -34,6 +32,7 @@ public class GameLoop extends AnimationTimer {
     private final Paddle paddle;
     private List<AbstractBrick> bricks;
     private final String levelPath;
+    private final Random random = new Random();
 
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -181,6 +180,11 @@ public class GameLoop extends AnimationTimer {
 
                 if (earliestBrick.isDestroyed()) {
                     addScore(earliestBrick.getScore());
+                    // Verifica si el ladrillo es un MultiBallBrickDecorator y activa el spawn
+                    if (earliestBrick instanceof MultiBallBrickDecorator) {
+                        MultiBallBrickDecorator multiBallBrick = (MultiBallBrickDecorator) earliestBrick;
+                        multiBallBrick.spawnExtraBalls(); // Pasa 'this' (GameLoop)
+                    }
                     bricks.remove(earliestBrick);
                 }
             }
@@ -258,9 +262,8 @@ public class GameLoop extends AnimationTimer {
         gc.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + size / 4);
         gc.bezierCurveTo(x - size / 2, y + size / 2, x, y + size, x, y + size * 1.25);
         gc.bezierCurveTo(x, y + size, x + size / 2, y + size / 2, x + size / 2, y + size / 4);
-        gc.bezierCurveTo(x + size / 2, y, x, y, x, y + size / 4);
-        gc.fill();
         gc.closePath();
+        gc.fill();
     }
 
     private void addScore(int points) {
@@ -305,5 +308,10 @@ public class GameLoop extends AnimationTimer {
 
     public List<Ball> getBalls() {
         return balls;
+    }
+
+    public void addBall(Ball ball) {
+        this.balls.add(ball);
+        System.out.println("[GAMELOOP] Bola añadida por decorador. Total: " + this.balls.size());
     }
 }
