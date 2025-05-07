@@ -11,9 +11,11 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -70,20 +72,26 @@ public class GameApp extends Application {
     }
 
     public static void startGame(String levelPath) {
-        Canvas canvas = new Canvas(WIDTH, HEIGHT);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        currentLoop = new GameLoop(gc, levelPath);
-
-        StackPane root = new StackPane(canvas);
-        root.setPrefSize(WIDTH, HEIGHT);
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-        configureInput(scene);
-        currentLoop.start();
-        currentLoop.startGame();
+        // Asegura que no haya GameLoop previo
+    if (currentLoop != null) {
+        currentLoop.stop();
+        currentLoop = null;
+    }
+    
+    // Crea una instancia completamente nueva
+    Canvas canvas = new Canvas(GameApp.WIDTH, GameApp.HEIGHT);
+    currentLoop = new GameLoop(canvas.getGraphicsContext2D(), levelPath);
+    
+    // Configuración de la escena
+    StackPane root = new StackPane(canvas);
+    Scene scene = new Scene(root);
+    primaryStage.setScene(scene);
+    
+    // Reinicia estados
+    GameStateManager.getInstance().restartGame();
+    configureInput(scene);
+    
+    currentLoop.start();
     }
 
     private static void configureInput(Scene scene) {
@@ -104,11 +112,18 @@ public class GameApp extends Application {
 
             if (e.getCode() == KeyCode.SPACE) {
                 if (gsm.isGameOver()) {
-                    gsm.restartGame();
-                    currentLoop.resetGame();
+                    gsm.restartGame(); // Reinicio el GameStateManager
+                    if (currentLoop != null) {
+                        currentLoop.stop();
+                        currentLoop = null;
+                    }
+                    new LevelMenu(primaryStage).show();
+                    
                 } else {
                     gsm.startGame();
-                    currentLoop.startGame();
+                    if (currentLoop != null) {
+                        currentLoop.startGame();
+                    }
                 }
             }
         });
@@ -125,7 +140,7 @@ public class GameApp extends Application {
 
     private void loadBackgroundTexture() {
         String path = ConfigLoader.getInstance().get("background.texture");
-        System.out.println("🧩 Cargando fondo desde: " + path);
+        System.out.println("Cargando fondo desde: " + path);
 
         try {
             var url = getClass().getClassLoader().getResource(path);
@@ -134,7 +149,7 @@ public class GameApp extends Application {
                 return;
             }
             backgroundImage = new Image(url.toExternalForm());
-            System.out.println("✅ Fondo cargado correctamente.");
+            System.out.println("Fondo cargado correctamente.");
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Error cargando la imagen de fondo.");

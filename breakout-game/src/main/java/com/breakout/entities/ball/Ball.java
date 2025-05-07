@@ -9,10 +9,9 @@ import javafx.scene.paint.Color;
 public class Ball {
     public static final double RADIUS = 10;
 
-    private double x, y;  // Posición actual
+    private double x, y, dx, dy;  // Posición actual y velocidad de los ejes x e y
     private double prevX, prevY;  // Posición anterior (para realizar colisiones, por ejemplo)
-    private double dx, dy;  // Velocidad en los ejes X e Y
-    private final double radius;  // Radio de la bola
+    private final double radius = ConfigLoader.getInstance().getDouble("ball.radius");
     private boolean active = true;  // Estado de la bola (activa/inactiva)
 
     private Image texture;  // Textura para la bola
@@ -22,7 +21,6 @@ public class Ball {
     public Ball(double startX, double startY) {
         this.x = startX;
         this.y = startY;
-        this.radius = ConfigLoader.getInstance().getDouble("ball.radius"); // Obtener el radio desde la configuración
         this.dx = ConfigLoader.getInstance().getDouble("ball.speed"); // Obtener la velocidad desde la configuración
         this.dy = this.dx;  // Usar la misma velocidad en X y Y por defecto
     }
@@ -34,14 +32,15 @@ public class Ball {
 
     // Actualizar la posición de la bola
     public void update() {
-        prevX = x;  // Guardamos la posición anterior
+        prevX = x;
         prevY = y;
 
-        // Si existe una estrategia de movimiento, la usamos
+        // Aplica movimiento según la estrategia
         if (movementStrategy != null) {
-            movementStrategy.move(this);  // Movimiento utilizando la estrategia
+            movementStrategy.move(this);
         } else {
-            x += dx;  // Movimiento por defecto
+            // Movimiento básico
+            x += dx;
             y += dy;
         }
     }

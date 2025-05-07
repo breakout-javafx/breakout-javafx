@@ -3,6 +3,7 @@ package com.breakout.core;
 import com.breakout.config.ConfigLoader;
 import com.breakout.entities.ball.Ball;
 import com.breakout.entities.ball.BallSpawner;
+import com.breakout.entities.ball.strategy.PaddleCollisionStrategy;
 import com.breakout.entities.brick.AbstractBrick;
 import com.breakout.entities.paddle.Paddle;
 import com.breakout.entities.wall.BottomWall;
@@ -87,52 +88,22 @@ public class GameLoop extends AnimationTimer {
     }
 
     private void updateBalls() {
-        int activeBallsBefore = countActiveBalls();
+        int ballsLost = 0;
     
-        // Eliminar bolas inactivas
         Iterator<Ball> iterator = balls.iterator();
-        int ballsRemoved = 0;
         while (iterator.hasNext()) {
-            if (!iterator.next().isActive()) {
-                iterator.remove();
-                ballsRemoved++;
-            }
-        }
-
-        if (ballsRemoved > 0) {
-            System.out.println("[JUEGO] Bolas eliminadas: " + ballsRemoved);
-        }
-    
-        // Actualizar bolas restantes
-        for (Ball ball : balls) {
+            Ball ball = iterator.next();
             ball.update();
         
-            // Detección de colisiones con bordes
-            if (ball.getX() <= 0) {
-                new LeftWall().onCollision(ball);
-                ball.setX(1); // Pequeño margen
-            } else if (ball.getX() >= GameApp.WIDTH - ball.getRadius() * 2) {
-                new RightWall().onCollision(ball);
-                ball.setX(GameApp.WIDTH - ball.getRadius() * 2 - 1);
-            }
-        
-            if (ball.getY() <= 0) {
-                new TopWall().onCollision(ball);
-                ball.setY(1);
-            }
-        
-            // Detección especial para fondo
-            if (ball.getY() > GameApp.HEIGHT) {
-                new BottomWall().onCollision(ball);
-                System.out.println("[FÍSICA] Bola en Y=" + ball.getY() + " (HEIGHT=" + GameApp.HEIGHT + ")");
+            if (!ball.isActive()) {
+                iterator.remove();
+                ballsLost++; // Contabiliza bolas perdidas
             }
         }
     
-        // Verificación final para pérdida de bola
-        int activeBallsAfter = countActiveBalls();
-        if (activeBallsBefore > 0 && activeBallsAfter == 0) {
-            System.out.println("[JUEGO] Última bola perdida - Notificando");
-            GameStateManager.getInstance().notifyLastBallLost();
+        // Notifica solo una vez por bola perdida
+        if (ballsLost > 0) {
+            GameStateManager.getInstance().loseLife();
         }
     }
 
@@ -144,7 +115,11 @@ public class GameLoop extends AnimationTimer {
     private void handleCollisions() {
         bricksRecentlyHit.clear();
     
-        for (Ball ball : balls) {
+        for (Ball ball : new ArrayList<>(balls)) {
+            if (ball.getBounds().intersects(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight())) {
+                new PaddleCollisionStrategy().onCollision(ball, paddle);
+            }
+
             double startX = ball.getPrevX(), startY = ball.getPrevY();
             double endX = ball.getX(), endY = ball.getY();
             double dx = endX - startX, dy = endY - startY;
@@ -229,13 +204,13 @@ public class GameLoop extends AnimationTimer {
     }
 
     public void renderGameOver() {
-        gc.setFill(Color.RED);
+        gc.setFill(Color.WHITE);
         gc.setFont(new Font(48));
         String text = "GAME OVER - Score: " + totalScore;
         gc.fillText(text, centerText(text, gc.getFont()), GameApp.HEIGHT / 2);
 
         gc.setFont(new Font(24));
-        String restart = "Press SPACE to return to menu";
+        String restart = "Presiona ESPACIO para volver al menu";
         gc.fillText(restart, centerText(restart, gc.getFont()), GameApp.HEIGHT / 2 + 50);
     }
 
