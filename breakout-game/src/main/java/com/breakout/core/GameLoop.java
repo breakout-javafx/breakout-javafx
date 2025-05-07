@@ -339,8 +339,8 @@ public void resetGame() {
 
     // Crear una nueva pelota y añadirla
     Ball newBall = ballSpawner.spawnBall(
-            paddle.getX() + paddle.getWidth() / 2,
-            paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius")
+        paddle.getX() + paddle.getWidth() / 2,
+        paddle.getY() - ConfigLoader.getInstance().getDouble("ball.radius")
     );
     balls.add(newBall);
 

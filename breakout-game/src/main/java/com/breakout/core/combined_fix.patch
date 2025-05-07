@@ -1,0 +1,9 @@
+From 123456789abcdef Mon May 6 2025 12:00:00 0000
+From: Combined Fix Bot <fix@mergepatch.local>
+Date: Tue, 6 May 2025 12:00:00 +0200
+Subject: [PATCH] Combina Singleton + Observador con lógica funcional de bola
+
+---
+ breakout-game/src/main/java/com/breakout/core/GameLoop.java | X +++++++++++++--
+ 1 file changed
+
